@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+	.footer-bg {
+		background-color: rgba(188, 185, 208, 0.19); /* Custom opacity */
+		backdrop-filter: blur(12px); /* Adjust the blur as needed */
+	}
+
+	.btn {
+		display: inline-block;
+		padding: 8px 15px;
+		border-radius: 5px;
+		cursor: pointer;
+	}
+}
