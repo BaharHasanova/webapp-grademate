@@ -6,8 +6,6 @@ import Footer from "./Footer";
 export default function IntroSection() {
 	return (
 		<div>
-			<Navbar />
-
 			<div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="grid md:grid-cols-2 gap-8 md:gap-12 xl:gap-24 items-center mt-20">
 					<div>
@@ -27,7 +25,7 @@ export default function IntroSection() {
 								Student
 							</a>
 							<a
-								href="alogin" // Adjust the href to the desired path.
+								href="/login" // Adjust the href to the desired path.
 								className="inline-flex justify-center items-center min-w-[255px] min-h-[73px] px-8 py-2 text-base font-bold rounded-full border-2 border-customTurquoise uppercase bg-transparent hover:bg-customTurquoise text-white no-underline disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-1 focus:ring-gray-600"
 							>
 								Advisor

@@ -17,7 +17,8 @@ const loginPage = () => {
 					// 'url("https://firebasestorage.googleapis.com/v0/b/realtimedatabasetest-f226a.appspot.com/o/6dc8b117-6b9f-4ab5-87b3-18ed1e8a15d0.jpg?alt=media")',
 				}}
 			>
-				<Navbar></Navbar>
+				<Navbar isHomePage={false} />
+
 				<Form></Form>
 			</div>
 		</>
