@@ -1,4 +1,5 @@
 "use client";
+import Navbar from "@/app/Components/Navbar";
 import type { NextPage } from "next";
 import { useCallback } from "react";
 
@@ -28,9 +29,7 @@ const AdminDashboard: NextPage = () => {
 					className="flex flex-row items-start justify-start cursor-pointer z-[1]"
 					onClick={onNavBarContainerClick}
 				>
-					<h2 className="m-0 relative text-inherit leading-[6.7px] uppercase font-bold font-inherit mq450:text-base mq450:leading-[22px]">
-						grademate
-					</h2>
+					<Navbar isHomePage={false} isLoginPage={false} />
 				</div>
 			</div>
 			<div className="self-stretch rounded-40xl [background:radial-gradient(50%_50%_at_50%_50%,_rgba(179,_121,_223,_0.2),_rgba(204,_88,_84,_0.02)_77.08%,_rgba(179,_121,_223,_0.2))] [backdrop-filter:blur(80px)] flex flex-row items-start justify-start gap-[23px] max-w-full z-[1] text-center text-base text-gray-100 font-poppins">

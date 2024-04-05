@@ -1,18 +1,9 @@
 import React from "react";
 import Link from "next/link";
 
-import Navbar from "./Navbar";
-
 const Form = () => {
 	return (
-		<div
-		// className="min-h-screen flex items-center justify-center"
-		// style={{
-		// 	backgroundImage: "url('/assets/login-page.png')",
-		// 	backgroundSize: "cover",
-		// 	backgroundAttachment: "fixed",
-		// }}
-		>
+		<div>
 			{/* Container for illustration and form */}
 			<div className="flex w-full max-w-4xl mx-auto bg-transparent">
 				{/* Illustration Container */}
@@ -103,25 +94,14 @@ const Form = () => {
 								</div>
 							</div>
 
-							{/* <button
-								type="submit"
-								className="w-full text-white bg-gradient-to-r from-purple-600 to-customTurquoise hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
-							>
-								Sign in
-							</button> */}
-
-							<Link href="/admin/main">
-								<button className="w-full text-white bg-gradient-to-r from-purple-600 to-customTurquoise hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-4 text-center">
+							<Link href="/advisorPage">
+								<button
+									type="submit"
+									className="w-full text-white bg-gradient-to-r from-purple-600 to-customTurquoise hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
+								>
 									Sign in
 								</button>
 							</Link>
-
-							{/* <a
-								href="admin/main"
-								className="w-full text-white bg-gradient-to-r from-purple-600 to-customTurquoise hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
-							>
-								Sign in
-							</a> */}
 						</form>
 					</div>
 				</div>

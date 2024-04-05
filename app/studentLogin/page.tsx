@@ -2,7 +2,7 @@ import Link from "next/link";
 import React from "react";
 import Navbar from "../Components/Navbar";
 
-const login = () => {
+const studentLogin = () => {
 	return (
 		<div
 			className="min-h-screen w-full bg-no-repeat bg-cover bg-fixed"
@@ -11,12 +11,7 @@ const login = () => {
 				// 'url("https://firebasestorage.googleapis.com/v0/b/realtimedatabasetest-f226a.appspot.com/o/6dc8b117-6b9f-4ab5-87b3-18ed1e8a15d0.jpg?alt=media")',
 			}}
 		>
-			<Navbar
-				isHomePage={false}
-				isLoginPage={true}
-				pageType="loginPage"
-				userName="Alice Smith"
-			/>
+			<Navbar isHomePage={false} isLoginPage={true} />
 			{/* Container for illustration and form */}
 			<div className="flex w-full max-w-4xl mx-auto bg-transparent">
 				{/* Illustration Container */}
@@ -45,7 +40,7 @@ const login = () => {
 						{/* Form Heading */}
 						<div className="text-center mb-10">
 							<h1 className="text-4xl font-bold text-white-900 mb-2">
-								Welcome to <br></br> GradeMate!
+								Welcome to <br></br> Student Portal!
 							</h1>
 							<p className="text-customGray">login to access your account</p>
 						</div>
@@ -101,17 +96,13 @@ const login = () => {
 									</label>
 								</div>
 								<div className="text-sm">
-									<a
-										href="/adminPage"
-										className="text-customTurquoise  hover:underline"
-									>
+									<a href="#" className="text-customTurquoise  hover:underline">
 										Forgot your password?
 									</a>
 								</div>
 							</div>
 
-							<Link href="/admin/main">
-								{/* <Link href="/adminPage"> */}
+							<Link href="/studentPage">
 								<button
 									type="submit"
 									className="w-full text-white bg-gradient-to-r from-purple-600 to-customTurquoise hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
@@ -127,4 +118,4 @@ const login = () => {
 	);
 };
 
-export default login;
+export default studentLogin;
