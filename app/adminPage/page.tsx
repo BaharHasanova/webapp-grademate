@@ -1,5 +1,6 @@
 import React from "react";
 import Navbar from "../Components/Navbar";
+import ExcelUploader from "../upload/page";
 
 const AdminPage = () => {
 	return (
@@ -86,6 +87,7 @@ const AdminPage = () => {
 						</div>
 					</div>
 					{/* Additional main content goes here */}
+					<div className="p-24 text-white"><ExcelUploader></ExcelUploader></div>
 				</div>
 			</div>
 		</div>
