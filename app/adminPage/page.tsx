@@ -1,15 +1,17 @@
+
 import React from "react";
 import Navbar from "../Components/Navbar";
-import ExcelUploader from "../upload/page";
+import AdminTable from "@/Components/FirebaseUtils/Utils/AdminTable";
 
 const AdminPage = () => {
 	return (
 		<div
-			className="min-h-screen w-full bg-no-repeat bg-cover bg-fixed flex flex-col"
-			style={{
-				backgroundImage: "url('/assets/login-page.png')",
-			}}
-		>
+		className="h-full w-full bg-no-repeat bg-cover  bg-center flex flex-col lg:p-12"
+		style={{
+		  backgroundImage: "url('/assets/login-page.png')",
+		  backgroundSize: "cover"
+		}}
+	  >
 			{/* Navbar - We ensure that the Navbar has a higher z-index */}
 			<Navbar
 				isHomePage={false}
@@ -17,20 +19,21 @@ const AdminPage = () => {
 				pageType="adminPage"
 				userName="Adam Johns"
 			/>
-			<div className="flex flex-grow min-h-screen">
+			
+			<div className="flex  min-h-screen flex-col lg:flex-row ">
 				{/* Sidebar */}
-				<div className="w-64 bg-bannerColor mt-8 rounded-3xl space-y-2 p-12  overflow-auto">
-					<div className="w-40 h-40 bg-gradient-to-t from-squareGradientDark to-squareGradientLight rounded-3xl mt-4 flex items-center justify-center">
-						<img src="/assets/archive-icon.png" alt="" width={70} height={70} />
+				<div className="lg:w-64 bg-bannerColor mt-8 rounded-3xl space-y-2 p-12  overflow-hidden m-4 hidden lg:block">
+					<div className="py-10   bg-gradient-to-t from-squareGradientDark to-squareGradientLight rounded-3xl mt-4 flex items-center justify-center">
+						<img src="/assets/archive-icon.png" alt="" className="w-12 h-12"  />
 					</div>
 					{/* Sidebar contents wrapped in a container for better spacing */}
-					<div className="space-y-4 py-8">
+					<div className="space-y-4 py-8 ">
 						<a
 							href="#registration"
 							className="flex items-center text-white py-2 rounded hover:bg-lightPurple"
 						>
-							<img className="h-6 w-6 mr-2" src="/assets/pencil.svg" alt="" />
-							Registration
+							<img className="h-6 w-6 mr-2 " src="/assets/pencil.svg" alt="" />
+							<div className="">Registration</div>
 						</a>
 						<a
 							href="#dashboard"
@@ -67,27 +70,27 @@ const AdminPage = () => {
 				</div>
 
 				{/* Main Content */}
-				<div className="flex-grow pl-18">
-					<div className="bg-bannerColor rounded-3xl m-8 p-12 flex justify-between items-center">
+				<div className="w-full lg:w-[80%] pl-18">
+					<div className="bg-bannerColor rounded-3xl m-8 p-12 flex justify-between items-center flex-col md:flex-row flex-col-reverse ">
 						<div className="space-y-3">
-							<h2 className="text-white font-bold text-5xl">
+							<h2 className="text-white font-bold  text-2xl lg:text-5xl">
 								Welcome back, Admin!
 							</h2>
-							<p className="text-white/50 text-2xl">
+							<p className="text-white/50 text-lg lg:text-2xl">
 								Always stay updated in your <b>ADMIN PORTAL</b>
 							</p>
-							<h5 className="text-white/50 text-xl">December 7, 2023</h5>
+							<h5 className="text-white/50 text-md lg:text-xl">December 7, 2023</h5>
 						</div>
 						<div>
 							<img
 								src="https://firebasestorage.googleapis.com/v0/b/realtimedatabasetest-f226a.appspot.com/o/bannerIllustrate.png?alt=media"
 								alt=""
-								className="max-w-xs md:max-w-sm lg:max-w-lg"
+								className="pb-12"
 							/>
 						</div>
 					</div>
 					{/* Additional main content goes here */}
-					<div className="p-24 text-white"><ExcelUploader></ExcelUploader></div>
+					<div className="px-24 text-white"><AdminTable></AdminTable></div>
 				</div>
 			</div>
 		</div>

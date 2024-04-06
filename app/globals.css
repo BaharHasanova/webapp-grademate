@@ -11,3 +11,7 @@
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: add shadow for depth */
 	}
 }
+
+#inputFile::-webkit-file-upload-button {
+	visibility: hidden;
+  }
