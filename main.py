@@ -5,7 +5,7 @@ import json
 
 
 from openai import OpenAI
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="")
 
 
 
