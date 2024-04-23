@@ -20,7 +20,7 @@ const AdvisorPage = () => {
   const [subjects, setSubjects] = useState([]);
 
   useEffect(() => {
-    const studentId = "tp052485";
+    const studentId = "A121031";
     const advisorId = "advisor1";
     const fetchSemesters = async () => {
       try {
