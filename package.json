@@ -20,6 +20,7 @@
     "pdfjs-dist": "^4.0.379",
     "preline": "^2.0.3",
     "react": "^18",
+    "react-circular-progressbar": "^2.1.0",
     "react-dom": "^18",
     "react-icons": "^5.0.1",
     "sonner": "^1.4.41",

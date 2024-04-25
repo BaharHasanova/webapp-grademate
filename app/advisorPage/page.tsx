@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import Navbar from "../Components/Navbar";
 import { jwtDecode } from "jwt-decode";
+import GradesTable from "../Components/GradesTable";
+import GradePercentage from "../Components/GradesPercentage";
 
 interface Semester {
   semester_id: number;
@@ -27,6 +29,18 @@ const AdvisorPage = () => {
   const [advisorId, setAdvisorId] = useState("");
   const [selectedAdvisee, setSelectedAdvisee] = useState("");
   const [selectedSemester, setSemesterId] = useState("");
+
+  const gradePercentage = 33;
+
+  const gradeData = [
+    { assessment: "Quiz", score: "10/10" },
+    { assessment: "Quiz", score: "10/10" },
+    { assessment: "Quiz", score: "10/10" },
+    { assessment: "Quiz", score: "10/10" },
+    { assessment: "Quiz", score: "10/10" },
+    { assessment: "Quiz", score: "10/10" },
+    // ... more data
+  ];
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -226,6 +240,17 @@ const AdvisorPage = () => {
           view grades of <u>Emily Johnson</u> - Semester 1 (2021 - 2022) - Data
           Visualization Programming :
         </h1>
+      </div>
+      <div className="flex flex-wrap justify-around items-center">
+        <div className="w-full md:w-[40%]">
+          {" "}
+          {/* You might need to adjust the margin */}
+          <GradesTable grades={gradeData} />
+        </div>
+
+        <div style={{ width: "330px", height: "330px" }}>
+          <GradePercentage percentage={gradePercentage} />
+        </div>
       </div>
     </div>
   );
