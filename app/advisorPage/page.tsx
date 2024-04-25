@@ -241,10 +241,11 @@ const AdvisorPage = () => {
           Visualization Programming :
         </h1>
       </div>
+
+      {/* Table and circle percentage */}
       <div className="flex flex-wrap justify-around items-center">
         <div className="w-full md:w-[40%]">
           {" "}
-          {/* You might need to adjust the margin */}
           <GradesTable grades={gradeData} />
         </div>
 
