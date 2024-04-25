@@ -3,11 +3,14 @@
 import React, { useState } from "react";
 import Form from "../Components/Form";
 import Navbar from "../Components/Navbar";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const advisorLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -23,24 +26,34 @@ const advisorLogin = () => {
         }
       );
 
-      console.log("response");
-      console.log(response);
-
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.message);
       }
 
       const data = await response.json();
 
       if (data.error) {
-        throw new Error(data.message); // Replace 'data.message' with your API's error message field
+        throw new Error(data.message);
       }
-      // Store the token somewhere (localStorage for example)
-      localStorage.setItem("token", data.token);
-      // Redirect the user to their dashboard or wherever needed
+
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        router.push("/advisorPage");
+      } else {
+        throw new Error("Token not provided");
+      }
+      // // Store the token somewhere (localStorage for example)
+      // localStorage.setItem("token", data.token);
+      // // Redirect the user to their dashboard or wherever needed
+      // router.push("/advisorPage");
     } catch (error) {
+      toast.error(
+        (error as { message: string }).message ||
+          "An error occurred during login."
+      );
+      console.error("Login failed:", error);
       setError("Failed to login");
-      // Handle error by setting state or however you prefer
     }
   };
 

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import Navbar from "../Components/Navbar";
+import { jwtDecode } from "jwt-decode";
 
 interface Semester {
   semester_id: number;
@@ -14,46 +15,94 @@ interface Advisee {
   full_name: string;
 }
 
+interface Subject {
+  semester_id: number;
+  name: string;
+}
+
 const AdvisorPage = () => {
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [advisees, setAdvisees] = useState<Advisee[]>([]);
-  const [subjects, setSubjects] = useState([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [advisorId, setAdvisorId] = useState("");
+  const [selectedAdvisee, setSelectedAdvisee] = useState("");
+  const [selectedSemester, setSemesterId] = useState("");
 
   useEffect(() => {
-    const studentId = "A121031";
-    const advisorId = "advisor1";
-    const fetchSemesters = async () => {
-      try {
-        const response = await Axios.get(
-          "http://127.0.0.1:5000/grademate/advisor/student/semesters",
-          {
-            params: { student_id: studentId },
-          }
-        );
-        setSemesters(response.data);
-      } catch (error) {
-        console.error("Failed to fetch semesters:", error);
-      }
-    };
-
-    // Fetch advisees
-    const fetchAdvisees = async () => {
-      try {
-        const response = await Axios.get(
-          "http://127.0.0.1:5000/grademate/advisor/students",
-          {
-            params: { advisor_id: advisorId },
-          }
-        );
-        setAdvisees(response.data);
-      } catch (error) {
-        console.error("Failed to fetch advisees:", error);
-      }
-    };
-
-    fetchSemesters();
-    fetchAdvisees();
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      setAdvisorId(decoded.advisor_id); // Assuming 'advisorId' is stored in the token
+    }
   }, []);
+
+  useEffect(() => {
+    if (advisorId) {
+      // Ensures we have the advisorId before making the call
+      const fetchAdvisees = async () => {
+        try {
+          const response = await Axios.get(
+            "http://127.0.0.1:5000/grademate/advisor/students",
+            {
+              params: { advisor_id: advisorId },
+            }
+          );
+          console.log("Advisees data:", response.data); // Debugging line
+          setAdvisees(response.data);
+        } catch (error) {
+          console.error("Failed to fetch advisees:", error);
+        }
+      };
+      fetchAdvisees();
+    }
+  }, [advisorId]); // Rerun this effect when advisorId changes
+
+  // Fetch semesters based on selected advisee
+  useEffect(() => {
+    if (selectedAdvisee) {
+      const fetchSemesters = async () => {
+        try {
+          const response = await Axios.get(
+            "http://127.0.0.1:5000/grademate/advisor/student/semesters",
+            { params: { student_id: selectedAdvisee } }
+          );
+          setSemesters(response.data);
+          setSemesterId(""); // Reset semester ID when a new advisee is selected
+          setSubjects([]); // Clear subjects when a new advisee is selected
+        } catch (error) {
+          console.error("Failed to fetch semesters:", error);
+          setSemesters([]); // Ensure semesters are cleared if fetch fails
+          setSubjects([]); // Also clear subjects
+        }
+      };
+      fetchSemesters();
+    } else {
+      setSemesters([]); // Clear semesters if no advisee is selected
+      setSubjects([]); // Clear subjects as well
+    }
+  }, [selectedAdvisee]); // Dependency on selectedAdvisee
+
+  // Select semester logic
+  useEffect(() => {
+    if (selectedSemester) {
+      const fetchSubjects = async () => {
+        setSubjects([]); // Clear previous subjects right before fetching new ones
+        try {
+          const response = await Axios.get(
+            "http://127.0.0.1:5000/grademate/advisor/student/semester/classes",
+            { params: { semester_id: selectedSemester } }
+          );
+          setSubjects(response.data);
+        } catch (error) {
+          console.error("Failed to fetch subjects:", error);
+          setSubjects([]); // Ensure subjects are cleared if fetch fails
+        }
+      };
+      fetchSubjects();
+    } else {
+      setSubjects([]); // Clear subjects if no semester is selected
+    }
+  }, [selectedSemester]); // Dependency on selectedSemester
 
   return (
     <div
@@ -110,13 +159,15 @@ const AdvisorPage = () => {
           <div className="relative inline-flex">
             <select
               id="advisee-select"
+              onChange={(e) => setSelectedAdvisee(e.target.value)}
+              defaultValue={""}
               className="py-3 px-4 inline-flex items-center gap-x-2 text-2xl font-medium rounded-lg border border-bannerColor bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
             >
-              <option value="" disabled selected hidden>
+              <option value="" disabled>
                 Select Your Advisee
               </option>
               {advisees.map((advisee) => (
-                <option key={advisee.student_id} value={advisee.full_name}>
+                <option key={advisee.student_id} value={advisee.student_id}>
                   {advisee.full_name}
                 </option>
               ))}
@@ -124,19 +175,21 @@ const AdvisorPage = () => {
           </div>
         </div>
 
-        {/*Selection Menu - Semester */}
+        {/* Render the semester dropdown only if an advisee has been selected */}
         <div className="flex flex-col items-start mb-6 w-full">
           <h2 className="text-white mb-6 text-2xl">Semester: </h2>
           <div className="relative inline-flex">
             <select
               id="semester-select"
+              onChange={(e) => setSemesterId(e.target.value)}
               className="py-3 px-4 inline-flex items-center gap-x-2 text-2xl font-medium rounded-lg border border-bannerColor bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+              disabled={!selectedAdvisee} // Disable if no advisee is selected
             >
-              <option value="" disabled selected hidden>
+              <option value="" disabled selected>
                 Select Semester
               </option>
               {semesters.map((semester) => (
-                <option key={semester.semester_id} value={semester.name}>
+                <option key={semester.semester_id} value={semester.semester_id}>
                   {semester.name}
                 </option>
               ))}
@@ -145,25 +198,23 @@ const AdvisorPage = () => {
         </div>
 
         {/*Selection Menu - Subject Name */}
-
         <div className="flex flex-col items-start mb-6 w-full">
           <h2 className="text-white mb-6 text-2xl">Subject Name: </h2>
           <div className="relative inline-flex">
             <select
               id="subject-select"
+              defaultValue={""}
               className="py-3 px-4 inline-flex items-center gap-x-2 text-2xl font-medium rounded-lg border border-bannerColor bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+              disabled={!selectedSemester} // Disable if no semester is selected
             >
-              <option value="" disabled selected hidden>
+              <option value="" disabled>
                 Select Subject
               </option>
-              <option value="Data Visualization Programming">
-                Data Visualization Programming
-              </option>
-              <option value="Software Testing">Software Testing</option>
-              <option value="Technology Entrepreneurship">
-                Technology Entrepreneurship
-              </option>
-              <option value="Software Security">Software Security</option>
+              {subjects.map((subject) => (
+                <option key={subject.semester_id} value={subject.name}>
+                  {subject.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
