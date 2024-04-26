@@ -20,6 +20,7 @@ interface Advisee {
 interface Subject {
   semester_id: number;
   name: string;
+  subject_id: number;
 }
 
 const AdvisorPage = () => {
@@ -29,16 +30,19 @@ const AdvisorPage = () => {
   const [advisorId, setAdvisorId] = useState("");
   const [selectedAdvisee, setSelectedAdvisee] = useState("");
   const [selectedSemester, setSemesterId] = useState("");
+  const [assessments, setAssessments] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [showGrades, setShowGrades] = useState(false);
 
   const gradePercentage = 33;
 
   const gradeData = [
-    { assessment: "Quiz", score: "10/10" },
-    { assessment: "Quiz", score: "10/10" },
-    { assessment: "Quiz", score: "10/10" },
-    { assessment: "Quiz", score: "10/10" },
-    { assessment: "Quiz", score: "10/10" },
-    { assessment: "Quiz", score: "10/10" },
+    { assessment: "Quiz", grade: "10", achievedGrade: "10" },
+    { assessment: "Quiz", grade: "10", achievedGrade: "10" },
+    { assessment: "Quiz", grade: "10", achievedGrade: "10" },
+    { assessment: "Quiz", grade: "10", achievedGrade: "10" },
+    { assessment: "Quiz", grade: "10", achievedGrade: "10" },
+    { assessment: "Quiz", grade: "10", achievedGrade: "10" },
     // ... more data
   ];
 
@@ -117,6 +121,27 @@ const AdvisorPage = () => {
       setSubjects([]); // Clear subjects if no semester is selected
     }
   }, [selectedSemester]); // Dependency on selectedSemester
+
+  const fetchAssessments = async () => {
+    if (selectedSubject) {
+      setAssessments([]); // Clear previous assessments
+      try {
+        const response = await Axios.get(
+          "http://127.0.0.1:5000/grademate/subject/assessments",
+          { params: { subject_id: selectedSubject } }
+        );
+        setAssessments(
+          response.data.map((a) => ({
+            type: a.type,
+            max_grade: a.max_grade,
+            achievedGrade: "", // Placeholder for now
+          }))
+        );
+      } catch (error) {
+        console.error("Failed to fetch assessments:", error);
+      }
+    }
+  };
 
   return (
     <div
@@ -217,6 +242,7 @@ const AdvisorPage = () => {
           <div className="relative inline-flex">
             <select
               id="subject-select"
+              onChange={(e) => setSelectedSubject(e.target.value)}
               defaultValue={""}
               className="py-3 px-4 inline-flex items-center gap-x-2 text-2xl font-medium rounded-lg border border-bannerColor bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
               disabled={!selectedSemester} // Disable if no semester is selected
@@ -225,13 +251,28 @@ const AdvisorPage = () => {
                 Select Subject
               </option>
               {subjects.map((subject) => (
-                <option key={subject.semester_id} value={subject.name}>
+                <option key={subject.semester_id} value={subject.subject_id}>
                   {subject.name}
                 </option>
               ))}
             </select>
           </div>
         </div>
+        {/* View Grades Button */}
+        {selectedSubject && (
+          <div className="text-center mt-6 mb-6">
+            <button
+              onClick={() => {
+                fetchAssessments();
+                setShowGrades(true); // This will trigger the table and percentage to display after fetching
+              }}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-blue-300"
+              disabled={!selectedSubject}
+            >
+              View Grades
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Text According to the selection */}
@@ -243,16 +284,23 @@ const AdvisorPage = () => {
       </div>
 
       {/* Table and circle percentage */}
-      <div className="flex flex-wrap justify-around items-center">
-        <div className="w-full md:w-[40%]">
-          {" "}
-          <GradesTable grades={gradeData} />
-        </div>
+      {showGrades && (
+        <div className="flex flex-wrap justify-around items-center">
+          <div className="w-full md:w-[40%]">
+            <GradesTable
+              grades={assessments.map((a) => ({
+                assessment: a.type,
+                max_grade: a.max_grade,
+                achievedGrade: "", // Placeholder for now
+              }))}
+            />
+          </div>
 
-        <div style={{ width: "330px", height: "330px" }}>
-          <GradePercentage percentage={gradePercentage} />
+          <div style={{ width: "330px", height: "330px" }}>
+            <GradePercentage percentage={gradePercentage} />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
