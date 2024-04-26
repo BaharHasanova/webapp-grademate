@@ -33,8 +33,9 @@ const AdvisorPage = () => {
   const [assessments, setAssessments] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState("");
   const [showGrades, setShowGrades] = useState(false);
-
-  const gradePercentage = 33;
+  const [gradePercentage, setGradePercentage] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const gradeData = [
     { assessment: "Quiz", grade: "10", achievedGrade: "10" },
@@ -123,23 +124,56 @@ const AdvisorPage = () => {
   }, [selectedSemester]); // Dependency on selectedSemester
 
   const fetchAssessments = async () => {
-    if (selectedSubject) {
-      setAssessments([]); // Clear previous assessments
+    if (selectedSubject && selectedAdvisee) {
+      setAssessments([]);
+      setIsLoading(true); // Start loading
+      setError(""); // Clear previous errors
+
       try {
-        const response = await Axios.get(
+        // Fetch the assessment structure
+        const assessmentsResponse = await Axios.get(
           "http://127.0.0.1:5000/grademate/subject/assessments",
           { params: { subject_id: selectedSubject } }
         );
-        setAssessments(
-          response.data.map((a) => ({
-            type: a.type,
-            max_grade: a.max_grade,
-            achievedGrade: "", // Placeholder for now
-          }))
+
+        // Fetch the achieved grades
+        const gradesResponse = await Axios.get(
+          "http://127.0.0.1:5000/grademate/student/assessment_grades",
+          {
+            params: {
+              subject_id: selectedSubject,
+              student_id: selectedAdvisee,
+            },
+          }
         );
+
+        // Combine both results
+        const combinedAssessments = assessmentsResponse.data.map(
+          (assessment) => {
+            const achievedGradeData = gradesResponse.data[1].find(
+              (grade) => grade.assessment_id === assessment.assessment_id
+            );
+            return {
+              type: assessment.type,
+              max_grade: `${assessment.max_grade}`,
+              achievedGrade: achievedGradeData
+                ? achievedGradeData.achieved_grade
+                : "N/A", // Show "N/A" if no grade is found
+            };
+          }
+        );
+
+        setAssessments(combinedAssessments);
+
+        // Update the grade percentage if present
+        setGradePercentage(gradesResponse.data[0].grade_percentage);
+
+        setShowGrades(true); // Show grades table and percentage
       } catch (error) {
         console.error("Failed to fetch assessments:", error);
+        setError("Failed to load data."); // Set an error message
       }
+      setIsLoading(false); // End loading
     }
   };
 
@@ -262,14 +296,11 @@ const AdvisorPage = () => {
         {selectedSubject && (
           <div className="text-center mt-6 mb-6">
             <button
-              onClick={() => {
-                fetchAssessments();
-                setShowGrades(true); // This will trigger the table and percentage to display after fetching
-              }}
+              onClick={fetchAssessments}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-blue-300"
-              disabled={!selectedSubject}
+              disabled={!selectedSubject || isLoading}
             >
-              View Grades
+              {isLoading ? "Loading..." : "View Grades"}
             </button>
           </div>
         )}
@@ -287,15 +318,8 @@ const AdvisorPage = () => {
       {showGrades && (
         <div className="flex flex-wrap justify-around items-center">
           <div className="w-full md:w-[40%]">
-            <GradesTable
-              grades={assessments.map((a) => ({
-                assessment: a.type,
-                max_grade: a.max_grade,
-                achievedGrade: "", // Placeholder for now
-              }))}
-            />
+            <GradesTable grades={assessments} />
           </div>
-
           <div style={{ width: "330px", height: "330px" }}>
             <GradePercentage percentage={gradePercentage} />
           </div>

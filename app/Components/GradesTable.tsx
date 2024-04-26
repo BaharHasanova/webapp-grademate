@@ -15,7 +15,7 @@ const GradesTable = ({ grades }) => {
             index % 2 ? "bg-purple-700" : "bg-purple-800"
           }`}
         >
-          <div className="w-1/3">{grade.assessment}</div>
+          <div className="w-1/3">{grade.type}</div>
           <div className="w-1/3">{grade.max_grade}</div>
           <div className="w-1/3">{grade.achievedGrade}</div>
         </div>
