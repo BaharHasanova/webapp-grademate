@@ -37,6 +37,8 @@ export default function StudentPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [grades, setGrades] = useState([]);
+  const [newAssessmentType, setNewAssessmentType] = useState("");
+  const [newMaxGrade, setNewMaxGrade] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -194,6 +196,51 @@ export default function StudentPage() {
     }
 
     setIsLoading(false); // End loading
+  };
+
+  // Function to handle the submission of the new assessment
+  const handleNewAssessmentSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!newAssessmentType || !newMaxGrade) {
+      alert("Please enter the assessment type and max grade.");
+      return;
+    }
+
+    try {
+      const response = await Axios.post(
+        "http://127.0.0.1:5000/grademate/subject/assessment",
+        {
+          type: newAssessmentType,
+          max_grade: newMaxGrade,
+          subject_id: selectedSubject,
+        }
+      );
+
+      if (response.status === 200) {
+        console.log("Assessment added successfully");
+        // Clear the form fields
+        setNewAssessmentType("");
+        setNewMaxGrade("");
+
+        // Fetch the updated assessments list to include the new assessment
+        const fetchAssessments = async () => {
+          const response = await Axios.get(
+            `http://127.0.0.1:5000/grademate/subject/assessments`,
+            { params: { subject_id: selectedSubject } }
+          );
+          setAssessmentsPass(response.data);
+          console.log("Updated assessments:", response.data);
+        };
+
+        await fetchAssessments(); // Update assessments for dropdown
+        await fetchAssessmentsTable(); // Update assessments for table
+      } else {
+        console.error("Failed to add assessment:", response.status);
+      }
+    } catch (error) {
+      console.error("Error adding assessment:", error);
+    }
   };
 
   // Toggle dropdown function
@@ -359,6 +406,33 @@ export default function StudentPage() {
             style={{ display: "none" }} // Keeps the input hidden
           />
           <>{data && columns && <Table data={data} columns={columns} />}</> */}
+          {/* Form to add a new assessment */}
+          {selectedSubject && (
+            <form onSubmit={handleNewAssessmentSubmit} className="my-8">
+              <div className="flex flex-col space-y-4">
+                <input
+                  type="text"
+                  value={newAssessmentType}
+                  onChange={(e) => setNewAssessmentType(e.target.value)}
+                  placeholder="Assessment Type"
+                  className="..."
+                />
+                <input
+                  type="number"
+                  value={newMaxGrade}
+                  onChange={(e) => setNewMaxGrade(e.target.value)}
+                  placeholder="Max Grade"
+                  className="..."
+                />
+                <button
+                  type="submit"
+                  className="text-white bg-gradient-to-r from-buttonPurple to-buttonOrange hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
+                >
+                  Add Assessment
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </div>
