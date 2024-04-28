@@ -8,7 +8,7 @@ const GradePercentage = ({ percentage }) => {
       text={`${percentage}%`}
       styles={buildStyles({
         textColor: "white",
-        pathColor: "orange", // Adjust color as needed
+        pathColor: "violet", // Adjust color as needed
         trailColor: "darkgrey", // Adjust color as needed
       })}
     />

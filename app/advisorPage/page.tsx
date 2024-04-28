@@ -37,16 +37,6 @@ const AdvisorPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const gradeData = [
-    { assessment: "Quiz", grade: "10", achievedGrade: "10" },
-    { assessment: "Quiz", grade: "10", achievedGrade: "10" },
-    { assessment: "Quiz", grade: "10", achievedGrade: "10" },
-    { assessment: "Quiz", grade: "10", achievedGrade: "10" },
-    { assessment: "Quiz", grade: "10", achievedGrade: "10" },
-    { assessment: "Quiz", grade: "10", achievedGrade: "10" },
-    // ... more data
-  ];
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {

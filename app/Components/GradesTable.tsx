@@ -17,7 +17,7 @@ const GradesTable = ({ grades }) => {
         >
           <div className="w-1/3">{grade.type}</div>
           <div className="w-1/3">{grade.max_grade}</div>
-          <div className="w-1/3">{grade.achievedGrade}</div>
+          <div className="w-1/3">{grade.achievedGrade}%</div>
         </div>
       ))}
     </div>
