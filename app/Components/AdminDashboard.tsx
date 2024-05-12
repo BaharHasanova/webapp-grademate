@@ -81,17 +81,18 @@ const AdminDashboard = () => {
                       <th className="py-2 px-4 border-b">Student ID</th>
                       <th className="py-2 px-4 border-b">Full Name</th>
                       <th className="py-2 px-4 border-b">Email</th>
-                      <th className="py-2 px-4 border-b">Status</th>
                       <th className="py-2 px-4 border-b">CGPA</th>
                       <th className="py-2 px-4 border-b">GPA</th>
                       <th className="py-2 px-4 border-b">Advisor</th>
                       <th className="py-2 px-4 border-b">Program</th>
+                      <th className="py-2 px-4 border-b">Status</th>
                     </>
                   ) : (
                     <>
                       <th className="py-2 px-4 border-b">Advisor ID</th>
                       <th className="py-2 px-4 border-b">Full Name</th>
                       <th className="py-2 px-4 border-b">Email</th>
+                      <th className="py-2 px-4 border-b">Status</th>
                     </>
                   )}
                 </tr>
@@ -104,19 +105,22 @@ const AdminDashboard = () => {
                         <td className="py-2 px-4">{item.student_id}</td>
                         <td className="py-2 px-4">{item.full_name}</td>
                         <td className="py-2 px-4">{item.email}</td>
-                        <td className="py-2 px-4">
-                          {item.status ? "Active" : "Deactivated"}
-                        </td>
                         <td className="py-2 px-4">{item.cgpa}</td>
                         <td className="py-2 px-4">{item.gpa}</td>
                         <td className="py-2 px-4">{item.advisor_id}</td>
                         <td className="py-2 px-4">{item.program_id}</td>
+                        <td className="py-2 px-4">
+                          {item.status ? "Active" : "Deactivated"}
+                        </td>
                       </>
                     ) : (
                       <>
                         <td className="py-2 px-4">{item.advisor_id}</td>
                         <td className="py-2 px-4">{item.full_name}</td>
                         <td className="py-2 px-4">{item.email}</td>
+                        <td className="py-2 px-4">
+                          {item.status ? "Active" : "Deactivated"}
+                        </td>
                       </>
                     )}
                   </tr>

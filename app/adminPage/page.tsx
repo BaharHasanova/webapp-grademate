@@ -24,6 +24,7 @@ const AdminPage = () => {
     full_name: "",
     email: "",
     password: "",
+    status: "Active",
   });
   const [advisors, setAdvisors] = useState([]);
   const [programs, setPrograms] = useState([]);
@@ -381,6 +382,20 @@ const AdminPage = () => {
                         onChange={handleInputChange}
                         className="py-2 px-4 rounded bg-white text-gray-800 w-full"
                       />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        Status:
+                      </label>
+                      <select
+                        name="status"
+                        value={advisorData.status}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Deactivated">Deactivated</option>
+                      </select>
                     </div>
                   </>
                 )}

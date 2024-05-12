@@ -33,20 +33,24 @@ const DropDashboard = () => {
         : [...prevSelected, id]
     );
   };
-
   const handleDropUsers = async () => {
     try {
       const url =
         viewType === "students"
           ? "http://127.0.0.1:5000/grademate/student/drop"
           : "http://127.0.0.1:5000/grademate/advisor/drop";
-      const response = await Axios.delete(url, {
-        data: { ids: selectedUsers }, // Axios DELETE requests with payload
+
+      // Prepare payload
+      //   const payload = { ids: selectedUsers };
+
+      const response = await Axios.put(url, {
+        ids: selectedUsers,
       });
+
       if (response.status === 200) {
         alert("Users dropped successfully!");
         setSelectedUsers([]); // Clear selection after successful drop
-        fetchData(); // Refresh the data
+        // fetchData(); // Refresh the data
       } else {
         alert("Failed to drop users.");
       }
@@ -114,17 +118,18 @@ const DropDashboard = () => {
                       <th className="py-2 px-4 border-b">Student ID</th>
                       <th className="py-2 px-4 border-b">Full Name</th>
                       <th className="py-2 px-4 border-b">Email</th>
-                      <th className="py-2 px-4 border-b">Status</th>
                       <th className="py-2 px-4 border-b">CGPA</th>
                       <th className="py-2 px-4 border-b">GPA</th>
                       <th className="py-2 px-4 border-b">Advisor</th>
                       <th className="py-2 px-4 border-b">Program</th>
+                      <th className="py-2 px-4 border-b">Status</th>
                     </>
                   ) : (
                     <>
                       <th className="py-2 px-4 border-b">Advisor ID</th>
                       <th className="py-2 px-4 border-b">Full Name</th>
                       <th className="py-2 px-4 border-b">Email</th>
+                      <th className="py-2 px-4 border-b">Status</th>
                     </>
                   )}
                 </tr>
@@ -154,19 +159,22 @@ const DropDashboard = () => {
                         <td className="py-2 px-4">{item.student_id}</td>
                         <td className="py-2 px-4">{item.full_name}</td>
                         <td className="py-2 px-4">{item.email}</td>
-                        <td className="py-2 px-4">
-                          {item.status ? "Active" : "Deactivated"}
-                        </td>
                         <td className="py-2 px-4">{item.cgpa}</td>
                         <td className="py-2 px-4">{item.gpa}</td>
                         <td className="py-2 px-4">{item.advisor_id}</td>
                         <td className="py-2 px-4">{item.program_id}</td>
+                        <td className="py-2 px-4">
+                          {item.status ? "Active" : "Deactivated"}
+                        </td>
                       </>
                     ) : (
                       <>
                         <td className="py-2 px-4">{item.advisor_id}</td>
                         <td className="py-2 px-4">{item.full_name}</td>
                         <td className="py-2 px-4">{item.email}</td>
+                        <td className="py-2 px-4">
+                          {item.status ? "Active" : "Deactivated"}
+                        </td>
                       </>
                     )}
                   </tr>
