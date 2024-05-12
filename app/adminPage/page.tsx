@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
 import Axios from "axios";
+import AdminDashboard from "../Components/AdminDashboard"; // Import the AdminDashboard component
 
 const AdminPage = () => {
   const [userType, setUserType] = useState("");
@@ -26,6 +27,7 @@ const AdminPage = () => {
   const [advisors, setAdvisors] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [responseMessage, setResponseMessage] = useState("");
+  const [view, setView] = useState("registration"); // State to manage view
 
   useEffect(() => {
     const fetchAdvisors = async () => {
@@ -104,15 +106,19 @@ const AdminPage = () => {
           </div>
           <div className="space-y-4 py-8">
             <a
-              href="#registration"
-              className="sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple"
+              onClick={() => setView("registration")} // Change view to registration
+              className={`sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple cursor-pointer ${
+                view === "registration" ? "bg-lightPurple" : ""
+              }`}
             >
               <img className="h-8 w-8 mr-2" src="/assets/pencil.svg" alt="" />
               Registration
             </a>
             <a
-              href="#dashboard"
-              className="sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple"
+              onClick={() => setView("dashboard")} // Change view to dashboard
+              className={`sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple cursor-pointer ${
+                view === "dashboard" ? "bg-lightPurple" : ""
+              }`}
             >
               <img
                 className="h-8 w-8 mr-2"
@@ -145,240 +151,253 @@ const AdminPage = () => {
         </div>
 
         <div className="flex-grow pl-18 pr-16">
-          <div className="bg-bannerColor rounded-3xl m-8 p-12 flex justify-between items-center">
-            <div className="space-y-3">
-              <h2 className="text-white font-bold text-5xl">
-                Welcome back, Admin!
-              </h2>
-              <p className="text-white/50 text-2xl">
-                Always stay updated in your <b>ADMIN PORTAL</b>
-              </p>
-              <h5 className="text-white/50 text-xl">December 7, 2023</h5>
-            </div>
-            <div>
-              <img
-                src="assets/admin-elements.svg"
-                alt=""
-                width={350}
-                height={350}
-              />
-            </div>
-          </div>
+          {view === "registration" ? (
+            <>
+              <div className="bg-bannerColor rounded-3xl m-8 p-12 flex justify-between items-center">
+                <div className="space-y-3">
+                  <h2 className="text-white font-bold text-5xl">
+                    Welcome back, Admin!
+                  </h2>
+                  <p className="text-white/50 text-2xl">
+                    Always stay updated in your <b>ADMIN PORTAL</b>
+                  </p>
+                  <h5 className="text-white/50 text-xl">December 7, 2023</h5>
+                </div>
+                <div>
+                  <img
+                    src="assets/admin-elements.svg"
+                    alt=""
+                    width={350}
+                    height={350}
+                  />
+                </div>
+              </div>
 
-          {/* Registration Form */}
-          <div id="registration" className="m-8 p-12 bg-lightPurple rounded-lg">
-            <h2 className="text-3xl text-white mb-6">User Registration</h2>
-            <div className="mb-4">
-              <label className="block text-white text-xl mb-2">
-                Select User Type:
-              </label>
-              <select
-                value={userType}
-                onChange={(e) => setUserType(e.target.value)}
-                className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+              {/* Registration Form */}
+              <div
+                id="registration"
+                className="m-8 p-12 bg-lightPurple rounded-lg"
               >
-                <option value="">Select User Type</option>
-                <option value="student">Student</option>
-                <option value="advisor">Advisor</option>
-              </select>
-            </div>
-
-            {userType === "student" && (
-              <>
+                <h2 className="text-3xl text-white mb-6">User Registration</h2>
                 <div className="mb-4">
                   <label className="block text-white text-xl mb-2">
-                    Student ID:
-                  </label>
-                  <input
-                    type="text"
-                    name="student_id"
-                    value={studentData.student_id}
-                    onChange={handleInputChange}
-                    className="py-2 px-4 rounded bg-white text-gray-800 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-white text-xl mb-2">
-                    Full Name:
-                  </label>
-                  <input
-                    type="text"
-                    name="full_name"
-                    value={studentData.full_name}
-                    onChange={handleInputChange}
-                    className="py-2 px-4 rounded bg-white text-gray-800 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-white text-xl mb-2">
-                    Email:
-                  </label>
-                  <input
-                    type="text"
-                    name="email"
-                    value={studentData.email}
-                    onChange={handleInputChange}
-                    className="py-2 px-4 rounded bg-white text-gray-800 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-white text-xl mb-2">
-                    Password:
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={studentData.password}
-                    onChange={handleInputChange}
-                    className="py-2 px-4 rounded bg-white text-gray-800 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-white text-xl mb-2">
-                    Status:
+                    Select User Type:
                   </label>
                   <select
-                    name="status"
-                    value={studentData.status}
-                    onChange={handleInputChange}
+                    value={userType}
+                    onChange={(e) => setUserType(e.target.value)}
                     className="py-2 px-4 rounded bg-white text-gray-800 w-full"
                   >
-                    <option value="Active">Active</option>
-                    <option value="Deactivated">Deactivated</option>
+                    <option value="">Select User Type</option>
+                    <option value="student">Student</option>
+                    <option value="advisor">Advisor</option>
                   </select>
                 </div>
-                <div className="mb-4">
-                  <label className="block text-white text-xl mb-2">CGPA:</label>
-                  <input
-                    type="number"
-                    name="cgpa"
-                    value={studentData.cgpa}
-                    onChange={handleInputChange}
-                    className="py-2 px-4 rounded bg-white text-gray-800 w-full"
-                    step="0.01"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-white text-xl mb-2">GPA:</label>
-                  <input
-                    type="number"
-                    name="gpa"
-                    value={studentData.gpa}
-                    onChange={handleInputChange}
-                    className="py-2 px-4 rounded bg-white text-gray-800 w-full"
-                    step="0.01"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-white text-xl mb-2">
-                    Advisor:
-                  </label>
-                  <select
-                    name="advisor_id"
-                    value={studentData.advisor_id}
-                    onChange={handleInputChange}
-                    className="py-2 px-4 rounded bg-white text-gray-800 w-full"
-                  >
-                    <option value="">Select Advisor</option>
-                    {advisors.map((advisor) => (
-                      <option
-                        key={advisor.advisor_id}
-                        value={advisor.advisor_id}
+
+                {userType === "student" && (
+                  <>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        Student ID:
+                      </label>
+                      <input
+                        type="text"
+                        name="student_id"
+                        value={studentData.student_id}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        Full Name:
+                      </label>
+                      <input
+                        type="text"
+                        name="full_name"
+                        value={studentData.full_name}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        Email:
+                      </label>
+                      <input
+                        type="text"
+                        name="email"
+                        value={studentData.email}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        Password:
+                      </label>
+                      <input
+                        type="password"
+                        name="password"
+                        value={studentData.password}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        Status:
+                      </label>
+                      <select
+                        name="status"
+                        value={studentData.status}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
                       >
-                        {advisor.full_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-4">
-                  <label className="block text-white text-xl mb-2">
-                    Program:
-                  </label>
-                  <select
-                    name="program_id"
-                    value={studentData.program_id}
-                    onChange={handleInputChange}
-                    className="py-2 px-4 rounded bg-white text-gray-800 w-full"
-                  >
-                    <option value="">Select Program</option>
-                    {programs.map((program) => (
-                      <option
-                        key={program.program_id}
-                        value={program.program_id}
+                        <option value="Active">Active</option>
+                        <option value="Deactivated">Deactivated</option>
+                      </select>
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        CGPA:
+                      </label>
+                      <input
+                        type="number"
+                        name="cgpa"
+                        value={studentData.cgpa}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+                        step="0.01"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        GPA:
+                      </label>
+                      <input
+                        type="number"
+                        name="gpa"
+                        value={studentData.gpa}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+                        step="0.01"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        Advisor:
+                      </label>
+                      <select
+                        name="advisor_id"
+                        value={studentData.advisor_id}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
                       >
-                        {program.program_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </>
-            )}
+                        <option value="">Select Advisor</option>
+                        {advisors.map((advisor) => (
+                          <option
+                            key={advisor.advisor_id}
+                            value={advisor.advisor_id}
+                          >
+                            {advisor.full_name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        Program:
+                      </label>
+                      <select
+                        name="program_id"
+                        value={studentData.program_id}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+                      >
+                        <option value="">Select Program</option>
+                        {programs.map((program) => (
+                          <option
+                            key={program.program_id}
+                            value={program.program_id}
+                          >
+                            {program.program_name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </>
+                )}
 
-            {userType === "advisor" && (
-              <>
-                <div className="mb-4">
-                  <label className="block text-white text-xl mb-2">
-                    Advisor ID:
-                  </label>
-                  <input
-                    type="text"
-                    name="advisor_id"
-                    value={advisorData.advisor_id}
-                    onChange={handleInputChange}
-                    className="py-2 px-4 rounded bg-white text-gray-800 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-white text-xl mb-2">
-                    Full Name:
-                  </label>
-                  <input
-                    type="text"
-                    name="full_name"
-                    value={advisorData.full_name}
-                    onChange={handleInputChange}
-                    className="py-2 px-4 rounded bg-white text-gray-800 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-white text-xl mb-2">
-                    Email:
-                  </label>
-                  <input
-                    type="text"
-                    name="email"
-                    value={advisorData.email}
-                    onChange={handleInputChange}
-                    className="py-2 px-4 rounded bg-white text-gray-800 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-white text-xl mb-2">
-                    Password:
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={advisorData.password}
-                    onChange={handleInputChange}
-                    className="py-2 px-4 rounded bg-white text-gray-800 w-full"
-                  />
-                </div>
-              </>
-            )}
+                {userType === "advisor" && (
+                  <>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        Advisor ID:
+                      </label>
+                      <input
+                        type="text"
+                        name="advisor_id"
+                        value={advisorData.advisor_id}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        Full Name:
+                      </label>
+                      <input
+                        type="text"
+                        name="full_name"
+                        value={advisorData.full_name}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        Email:
+                      </label>
+                      <input
+                        type="text"
+                        name="email"
+                        value={advisorData.email}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-xl mb-2">
+                        Password:
+                      </label>
+                      <input
+                        type="password"
+                        name="password"
+                        value={advisorData.password}
+                        onChange={handleInputChange}
+                        className="py-2 px-4 rounded bg-white text-gray-800 w-full"
+                      />
+                    </div>
+                  </>
+                )}
 
-            <div className="text-center">
-              <button
-                onClick={handleSubmit}
-                className="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-700"
-              >
-                Register {userType === "student" ? "Student" : "Advisor"}
-              </button>
-              {responseMessage && (
-                <p className="text-white mt-4">{responseMessage}</p>
-              )}
-            </div>
-          </div>
+                <div className="text-center">
+                  <button
+                    onClick={handleSubmit}
+                    className="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Register {userType === "student" ? "Student" : "Advisor"}
+                  </button>
+                  {responseMessage && (
+                    <p className="text-white mt-4">{responseMessage}</p>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <AdminDashboard /> // Render the AdminDashboard component
+          )}
         </div>
       </div>
     </div>
