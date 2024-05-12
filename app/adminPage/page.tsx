@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
 import Axios from "axios";
 import AdminDashboard from "../Components/AdminDashboard"; // Import the AdminDashboard component
+import DropDashboard from "../Components/AdminDrop"; // Import the DropDashboard component
 
 const AdminPage = () => {
   const [userType, setUserType] = useState("");
@@ -128,8 +129,10 @@ const AdminPage = () => {
               Dashboard
             </a>
             <a
-              href="#drop"
-              className="sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple"
+              onClick={() => setView("drop")} // Change view to drop
+              className={`sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple cursor-pointer ${
+                view === "drop" ? "bg-lightPurple" : ""
+              }`}
             >
               <img
                 className="h-8 w-8 mr-2"
@@ -395,8 +398,10 @@ const AdminPage = () => {
                 </div>
               </div>
             </>
-          ) : (
+          ) : view === "dashboard" ? (
             <AdminDashboard /> // Render the AdminDashboard component
+          ) : (
+            <DropDashboard /> // Render the DropDashboard component
           )}
         </div>
       </div>
