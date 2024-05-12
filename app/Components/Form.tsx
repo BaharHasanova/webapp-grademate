@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface FormProps {
 	email: string;
@@ -15,76 +15,78 @@ const Form: React.FC<FormProps> = ({
 	onPasswordChange,
 	onSubmit,
 }) => {
+	const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+	const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+
+	const handleForgotPasswordClick = (
+		e: React.MouseEvent<HTMLAnchorElement>
+	) => {
+		e.preventDefault();
+		setShowForgotPasswordModal(true);
+	};
+
+	const handleForgotPasswordSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		// Implement password recovery logic here
+		alert(`Password recovery link sent to ${forgotPasswordEmail}`);
+		setShowForgotPasswordModal(false);
+	};
+
 	return (
-		<div>
-			{/* Container for illustration and form */}
-			<div className="flex w-full max-w-4xl mx-auto bg-transparent">
-				{/* Illustration Container */}
-				<div
-					className="w-1/2 m-4"
-					style={{
-						backgroundImage: "url('/assets/illustration-phone.png')",
-						backgroundSize: "cover",
-						backgroundPosition: "center",
-						backgroundRepeat: "no-repeat",
-					}}
-				/>
+		<section className="max-w-[145rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 my-auto mx-auto">
+			<div className="h-full flex items-center justify-center lg:justify-between">
+				<div className="mb-6 lg:mb-0 lg:w-1/2">
+					<img
+						src="assets/Group 37326.svg"
+						className="w-full"
+						alt="Student w/ Phone"
+					/>
+				</div>
 
-				{/* Form Container */}
-				<div className="w-1/2">
-					<div
-						className="bg-white p-8 rounded-xl shadow-xl"
-						style={{
-							backdropFilter: "blur(16px)",
-							backgroundColor: "rgba(255, 255, 255, 0.2)",
-							border: "1px solid rgba(255, 255, 255, 0.2)",
-							boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-							color: "white",
-						}}
-					>
+				<div className="lg:w-1/2 w-full px-6">
+					<div className="p-8 bg-white/10 backdrop-blur-md rounded-3xl shadow-lg">
 						{/* Form Heading */}
-						<div className="text-center mb-10">
-							<h1 className="text-4xl font-bold text-white-900 mb-2">
-								Welcome to <br></br> Dashboard!
-							</h1>
-							<p className="text-customGray">login to access your account</p>
-						</div>
+						<h1 className="text-center text-4xl font-bold text-white mb-4">
+							Welcome to <br /> Advisor Dashboard!
+						</h1>
+						<p className="text-center text-lg text-gray-300 mb-6">
+							login to access your account
+						</p>
 
-						{/* Form Fields */}
 						<form className="space-y-6" onSubmit={onSubmit}>
 							<div>
 								<label
 									htmlFor="email"
-									className="text-sm font-medium text-customGray block mb-2"
+									className="text-2xl font-medium text-gray-300 block mb-2"
 								>
 									Email Address
 								</label>
 								<input
 									type="email"
 									id="email"
-									className="w-full p-4 text-sm text-customGray bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+									className="w-full p-4 text-2xl text-gray-900 bg-gray-800/50 rounded-lg border border-gray-600 focus:ring-blue-500 focus:border-blue-500"
 									placeholder="Email Address"
 									value={email}
 									onChange={onEmailChange}
-									// required
+									required
 								/>
 							</div>
 
 							<div>
 								<label
 									htmlFor="password"
-									className="text-sm font-medium text-customGray block mb-2"
+									className="text-2xl font-medium text-gray-300 block mb-2"
 								>
 									Password
 								</label>
 								<input
 									type="password"
 									id="password"
-									className="w-full p-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+									className="w-full p-4 text-2xl text-gray-900 bg-gray-800/50 rounded-lg border border-gray-600 focus:ring-blue-500 focus:border-blue-500"
 									placeholder="Password"
 									value={password}
 									onChange={onPasswordChange}
-									// required
+									required
 								/>
 							</div>
 
@@ -98,21 +100,24 @@ const Form: React.FC<FormProps> = ({
 									/>
 									<label
 										htmlFor="remember-me"
-										className="ml-2 block text-sm text-customGray"
+										className="ml-2 block text-xl text-gray-300"
 									>
-										{" "}
-										Remember me{" "}
+										Remember me
 									</label>
 								</div>
-								<div className="text-sm">
-									<a href="#" className="text-customTurquoise  hover:underline">
+								<div className="text-xl">
+									<a
+										href="#"
+										className="text-blue-400 hover:underline"
+										onClick={handleForgotPasswordClick}
+									>
 										Forgot your password?
 									</a>
 								</div>
 							</div>
 							<button
 								type="submit"
-								className="w-full text-white bg-gradient-to-r from-purple-600 to-customTurquoise hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
+								className="text-2xl w-full text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-5 py-4 text-center"
 							>
 								Sign in
 							</button>
@@ -120,7 +125,51 @@ const Form: React.FC<FormProps> = ({
 					</div>
 				</div>
 			</div>
-		</div>
+			{/* Forgot Password Modal */}
+			{showForgotPasswordModal && (
+				<div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center">
+					<div className="bg-white rounded-lg shadow-xl p-8 max-w-sm w-full">
+						<h2 className="text-2xl font-bold mb-4 text-center">
+							Forgot Password
+						</h2>
+						<form onSubmit={handleForgotPasswordSubmit}>
+							<div className="mb-4">
+								<label
+									htmlFor="forgot-password-email"
+									className="block text-gray-700 text-sm font-bold mb-2"
+								>
+									Enter your email address
+								</label>
+								<input
+									type="email"
+									id="forgot-password-email"
+									className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+									placeholder="Email Address"
+									value={forgotPasswordEmail}
+									onChange={(e) => setForgotPasswordEmail(e.target.value)}
+									required
+								/>
+							</div>
+							<div className="flex justify-between">
+								<button
+									type="button"
+									className="text-sm text-gray-500 hover:underline"
+									onClick={() => setShowForgotPasswordModal(false)}
+								>
+									Cancel
+								</button>
+								<button
+									type="submit"
+									className="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600"
+								>
+									Submit
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			)}
+		</section>
 	);
 };
 

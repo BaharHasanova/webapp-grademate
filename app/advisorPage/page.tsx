@@ -1,11 +1,17 @@
-"use client"; // This is a client component || to be able to use useState, useEffect, etc
+"use client";
 
 import React, { useState, useEffect } from "react";
-import Axios from "axios";
 import Navbar from "../Components/Navbar";
 import { jwtDecode } from "jwt-decode";
+import Axios from "axios";
 import GradesTable from "../Components/GradesTable";
 import GradePercentage from "../Components/GradesPercentage";
+
+// Utility function to format the date
+const formatDate = (date: Date) => {
+	const options = { year: "numeric", month: "long", day: "numeric" };
+	return date.toLocaleDateString(undefined, options);
+};
 
 interface Semester {
 	semester_id: number;
@@ -47,7 +53,6 @@ const AdvisorPage = () => {
 
 	useEffect(() => {
 		if (advisorId) {
-			// Ensures we have the advisorId before making the call
 			const fetchAdvisees = async () => {
 				try {
 					const response = await Axios.get(
@@ -56,7 +61,7 @@ const AdvisorPage = () => {
 							params: { advisor_id: advisorId },
 						}
 					);
-					console.log("Advisees data:", response.data); // Debugging line
+					console.log("Advisees data:", response.data);
 					setAdvisees(response.data);
 				} catch (error) {
 					console.error("Failed to fetch advisees:", error);
@@ -64,9 +69,8 @@ const AdvisorPage = () => {
 			};
 			fetchAdvisees();
 		}
-	}, [advisorId]); // Rerun this effect when advisorId changes
+	}, [advisorId]);
 
-	// Fetch semesters based on selected advisee
 	useEffect(() => {
 		if (selectedAdvisee) {
 			const fetchSemesters = async () => {
@@ -76,26 +80,25 @@ const AdvisorPage = () => {
 						{ params: { student_id: selectedAdvisee } }
 					);
 					setSemesters(response.data);
-					setSemesterId(""); // Reset semester ID when a new advisee is selected
-					setSubjects([]); // Clear subjects when a new advisee is selected
+					setSemesterId("");
+					setSubjects([]);
 				} catch (error) {
 					console.error("Failed to fetch semesters:", error);
-					setSemesters([]); // Ensure semesters are cleared if fetch fails
-					setSubjects([]); // Also clear subjects
+					setSemesters([]);
+					setSubjects([]);
 				}
 			};
 			fetchSemesters();
 		} else {
-			setSemesters([]); // Clear semesters if no advisee is selected
-			setSubjects([]); // Clear subjects as well
+			setSemesters([]);
+			setSubjects([]);
 		}
-	}, [selectedAdvisee]); // Dependency on selectedAdvisee
+	}, [selectedAdvisee]);
 
-	// Select semester logic
 	useEffect(() => {
 		if (selectedSemester) {
 			const fetchSubjects = async () => {
-				setSubjects([]); // Clear previous subjects right before fetching new ones
+				setSubjects([]);
 				try {
 					const response = await Axios.get(
 						"http://127.0.0.1:5000/grademate/advisor/student/semester/classes",
@@ -104,29 +107,27 @@ const AdvisorPage = () => {
 					setSubjects(response.data);
 				} catch (error) {
 					console.error("Failed to fetch subjects:", error);
-					setSubjects([]); // Ensure subjects are cleared if fetch fails
+					setSubjects([]);
 				}
 			};
 			fetchSubjects();
 		} else {
-			setSubjects([]); // Clear subjects if no semester is selected
+			setSubjects([]);
 		}
-	}, [selectedSemester]); // Dependency on selectedSemester
+	}, [selectedSemester]);
 
 	const fetchAssessments = async () => {
 		if (selectedSubject && selectedAdvisee) {
 			setAssessments([]);
-			setIsLoading(true); // Start loading
-			setError(""); // Clear previous errors
+			setIsLoading(true);
+			setError("");
 
 			try {
-				// Fetch the assessment structure
 				const assessmentsResponse = await Axios.get(
 					"http://127.0.0.1:5000/grademate/subject/assessments",
 					{ params: { subject_id: selectedSubject } }
 				);
 
-				// Fetch the achieved grades
 				const gradesResponse = await Axios.get(
 					"http://127.0.0.1:5000/grademate/student/assessment_grades",
 					{
@@ -137,7 +138,6 @@ const AdvisorPage = () => {
 					}
 				);
 
-				// Combine both results
 				const combinedAssessments = assessmentsResponse.data.map(
 					(assessment) => {
 						const achievedGradeData = gradesResponse.data[1].find(
@@ -148,22 +148,19 @@ const AdvisorPage = () => {
 							max_grade: `${assessment.max_grade}`,
 							achievedGrade: achievedGradeData
 								? achievedGradeData.achieved_grade
-								: "N/A", // Show "N/A" if no grade is found
+								: "N/A",
 						};
 					}
 				);
 
 				setAssessments(combinedAssessments);
-
-				// Update the grade percentage if present
 				setGradePercentage(gradesResponse.data[0].grade_percentage);
-
-				setShowGrades(true); // Show grades table and percentage
+				setShowGrades(true);
 			} catch (error) {
 				console.error("Failed to fetch assessments:", error);
-				setError("Failed to load data."); // Set an error message
+				setError("Failed to load data.");
 			}
-			setIsLoading(false); // End loading
+			setIsLoading(false);
 		}
 	};
 
@@ -174,7 +171,6 @@ const AdvisorPage = () => {
 				backgroundImage: "url('/assets/login-page.png')",
 			}}
 		>
-			{/* Navbar - We ensure that the Navbar has a higher z-index */}
 			<Navbar
 				isHomePage={false}
 				isLoginPage={false}
@@ -182,141 +178,125 @@ const AdvisorPage = () => {
 				userName="Advisor"
 			/>
 
-			{/* Welcome Header */}
-			<div className="w-full text-center py-4">
-				<h1 className="text-4xl text-white font-semibold">
-					Welcome To Your Dashboard
-				</h1>
-			</div>
-
-			{/* Banner */}
 			<div className="mx-24">
 				<div className="h-12"></div>
-				<div className="bg-bannerColor h-64 rounded-3xl p-12 flex flex-row items-center justify-between">
-					<div className="h-full flex flex-col space-y-12 mr-8 pl-8">
-						<div className="space-y-3">
-							<h2 className="text-white font-bold text-5xl">
-								Welcome back, Advisor!
-							</h2>
-							<p className="text-white/50 text-2xl">
-								Always stay updated in your <b>ADVISOR PORTAL</b>
-							</p>
+				<Banner userName="Advisor" />
+
+				<div className="mx-24 mt-8 flex justify-between items-end">
+					<div className="select-container">
+						<h2 className="text-white mb-6 text-2xl">Student Name: </h2>
+						<select
+							id="advisee-select"
+							onChange={(e) => setSelectedAdvisee(e.target.value)}
+							defaultValue={""}
+							className="select-style"
+						>
+							<option value="" disabled>
+								Select Your Advisee
+							</option>
+							{advisees.map((advisee) => (
+								<option key={advisee.student_id} value={advisee.student_id}>
+									{advisee.full_name}
+								</option>
+							))}
+						</select>
+					</div>
+					<div className="select-container">
+						<h2 className="text-white mb-6 text-2xl">Semester: </h2>
+						<select
+							id="semester-select"
+							onChange={(e) => setSemesterId(e.target.value)}
+							className="select-style"
+							disabled={!selectedAdvisee}
+						>
+							<option value="" disabled selected>
+								Select Semester
+							</option>
+							{semesters.map((semester) => (
+								<option key={semester.semester_id} value={semester.semester_id}>
+									{semester.name}
+								</option>
+							))}
+						</select>
+					</div>
+					<div className="select-container">
+						<h2 className="text-white mb-6 text-2xl">Subject Name: </h2>
+						<select
+							id="subject-select"
+							onChange={(e) => setSelectedSubject(e.target.value)}
+							defaultValue={""}
+							className="select-style"
+							disabled={!selectedSemester}
+						>
+							<option value="" disabled>
+								Select Subject
+							</option>
+							{subjects.map((subject) => (
+								<option key={subject.semester_id} value={subject.subject_id}>
+									{subject.name}
+								</option>
+							))}
+						</select>
+					</div>
+					<div className="button-container">
+						{selectedSubject && (
+							<div className="flex flex-col ml-4 mb-6 w-full">
+								<button
+									onClick={fetchAssessments}
+									className="py-3 px-10 text-white bg-gradient-to-r from-purple-600 to-customTurquoise hover:bg-gradient-to-br font-bold rounded disabled:bg-blue-300"
+									style={{ maxWidth: "250px" }}
+									disabled={!selectedSubject || isLoading}
+								>
+									{isLoading ? "Loading..." : "View Grades"}
+								</button>
+							</div>
+						)}
+					</div>
+				</div>
+
+				{showGrades && (
+					<div className="flex flex-wrap justify-around items-start mt-12">
+						<div
+							className="w-full md:w-[60%] mt-20"
+							style={{ minHeight: "500px" }}
+						>
+							<GradesTable grades={assessments} />
 						</div>
-						<h5 className="text-white/50 text-xl">December 7, 2023</h5>
-					</div>
-					<div>
-						<img
-							src="assets/advisor-elements.svg"
-							alt=""
-							width={550}
-							height={550}
-						/>
-					</div>
-				</div>
-			</div>
-
-			{/* Main Flex Container */}
-			<div className="mx-24 mt-8 flex justify-between items-end">
-				{" "}
-				{/* Advisee Selection */}
-				<div className="select-container">
-					<h2 className="text-white mb-6 text-2xl">Student Name: </h2>
-					<select
-						id="advisee-select"
-						onChange={(e) => setSelectedAdvisee(e.target.value)}
-						defaultValue={""}
-						className="select-style"
-					>
-						<option value="" disabled>
-							Select Your Advisee
-						</option>
-						{advisees.map((advisee) => (
-							<option key={advisee.student_id} value={advisee.student_id}>
-								{advisee.full_name}
-							</option>
-						))}
-					</select>
-				</div>
-				{/* Semester Selection */}
-				<div className="select-container">
-					<h2 className="text-white mb-6 text-2xl">Semester: </h2>
-					<select
-						id="semester-select"
-						onChange={(e) => setSemesterId(e.target.value)}
-						className="select-style"
-						disabled={!selectedAdvisee}
-					>
-						<option value="" disabled selected>
-							Select Semester
-						</option>
-						{semesters.map((semester) => (
-							<option key={semester.semester_id} value={semester.semester_id}>
-								{semester.name}
-							</option>
-						))}
-					</select>
-				</div>
-				{/* Subject Name Selection */}
-				<div className="select-container">
-					<h2 className="text-white mb-6 text-2xl">Subject Name: </h2>
-					<select
-						id="subject-select"
-						onChange={(e) => setSelectedSubject(e.target.value)}
-						defaultValue={""}
-						className="select-style"
-						disabled={!selectedSemester}
-					>
-						<option value="" disabled>
-							Select Subject
-						</option>
-						{subjects.map((subject) => (
-							<option key={subject.semester_id} value={subject.subject_id}>
-								{subject.name}
-							</option>
-						))}
-					</select>
-				</div>
-				{/* View Grades Button */}
-				<div className="button-container">
-					{selectedSubject && (
-						<div className="flex flex-col ml-4 mb-6 w-full">
-							<button
-								onClick={fetchAssessments}
-								className="py-3 px-10 text-white bg-gradient-to-r from-purple-600 to-customTurquoise hover:bg-gradient-to-br font-bold rounded disabled:bg-blue-300"
-								style={{ maxWidth: "250px" }}
-								disabled={!selectedSubject || isLoading}
-							>
-								{isLoading ? "Loading..." : "View Grades"}
-							</button>
+						<div style={{ width: "330px", height: "330px", marginTop: "0px" }}>
+							<GradePercentage percentage={gradePercentage} />
 						</div>
-					)}
-				</div>
+					</div>
+				)}
 			</div>
-
-			{/* Text According to the selection 
-      <div className="w-full text-center py-8">
-        <h1 className="text-2xl text-white font-semibold">
-          view grades of <u>Emily Johnson</u> - Semester 1 (2021 - 2022) - Data
-          Visualization Programming :
-        </h1>
-      </div>*/}
-
-			{/* Table and circle percentage */}
-			{showGrades && (
-				<div className="flex flex-wrap justify-around items-start mt-12">
-					<div
-						className="w-full md:w-[60%] mt-20"
-						style={{ minHeight: "500px" }}
-					>
-						<GradesTable grades={assessments} />
-					</div>
-					<div style={{ width: "330px", height: "330px", marginTop: "0px" }}>
-						<GradePercentage percentage={gradePercentage} />
-					</div>
-				</div>
-			)}
 		</div>
 	);
 };
+
+function Banner({ userName }) {
+	const today = new Date(); // Ensure today is a Date object
+	return (
+		<div className="bg-bannerColor h-64 rounded-3xl p-12 flex flex-row items-center justify-between">
+			<div className="h-full flex flex-col space-y-12 mr-8 pl-8">
+				<div className="space-y-3">
+					<h2 className="text-white font-bold text-5xl">
+						Welcome back, {userName}!
+					</h2>
+					<p className="text-white/50 text-2xl">
+						Always stay updated in your <b>ADVISOR DASHBOARD</b>
+					</p>
+				</div>
+				<h5 className="text-white/50 text-xl">{formatDate(today)}</h5>
+			</div>
+			<div>
+				<img
+					src="assets/advisor-elements.svg"
+					alt="Banner Illustration"
+					width={500}
+					height={500}
+				/>
+			</div>
+		</div>
+	);
+}
 
 export default AdvisorPage;
