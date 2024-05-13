@@ -23,7 +23,6 @@ interface ClassCode {
 }
 
 export default function StudentPage() {
-	// Renamed to reflect the content
 	const [file, setFile] = useState(null);
 	const [responseMessage, setResponseMessage] = useState("");
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -341,14 +340,6 @@ export default function StudentPage() {
 							</select>
 						</div>
 					</div>
-					<div className="text-center justify-center items-center p-12 text-white text-2xl ">
-						<h3>
-							NOTE: Please enter the total combined grade for all quizzes/labs
-							taken (Quiz = 20, Lab = 15),
-							<br /> rather than individual grades for each quiz/lab(Quiz1 = 5,
-							Lab2 = 10){" "}
-						</h3>
-					</div>
 
 					{/* Table and circle percentage */}
 					{showGrades && (
@@ -423,32 +414,38 @@ export default function StudentPage() {
             style={{ display: "none" }} // Keeps the input hidden
           />
           <>{data && columns && <Table data={data} columns={columns} />}</> */}
+
 					{/* Form to add a new assessment */}
 					{selectedSubject && (
-						<form onSubmit={handleNewAssessmentSubmit} className="my-8">
-							<div className="flex flex-col space-y-4">
-								<input
-									type="text"
-									value={newAssessmentType}
-									onChange={(e) => setNewAssessmentType(e.target.value)}
-									placeholder="Assessment Type"
-									className="w-full p-4 text-xl font-medium text-white bg-transparent border-2 rounded-lg placeholder-purple-300 border-purple-500 focus:border-purple-700 focus:bg-dark-500 focus:outline-none transition duration-150 ease-in-out"
-								/>
-								<input
-									type="number"
-									value={newMaxGrade}
-									onChange={(e) => setNewMaxGrade(e.target.value)}
-									placeholder="Max Grade"
-									className="w-full p-4 text-xl font-medium text-white bg-transparent border-2 rounded-lg placeholder-purple-300 border-purple-500 focus:border-purple-700 focus:bg-dark-500 focus:outline-none transition duration-150 ease-in-out"
-								/>
-								<button
-									type="submit"
-									className="text-white bg-gradient-to-r from-buttonPurple to-buttonOrange hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
-								>
-									Add Assessment
-								</button>
+						<>
+							<div className="text-center justify-center items-center p-12 text-white text-2xl ">
+								<h3>Add the Assessment: </h3>
 							</div>
-						</form>
+							<form onSubmit={handleNewAssessmentSubmit} className="my-8">
+								<div className="flex flex-col space-y-4">
+									<input
+										type="text"
+										value={newAssessmentType}
+										onChange={(e) => setNewAssessmentType(e.target.value)}
+										placeholder="Assessment Type"
+										className="w-full p-4 text-xl font-medium text-white bg-transparent border-2 rounded-lg placeholder-purple-300 border-purple-500 focus:border-purple-700 focus:bg-dark-500 focus:outline-none transition duration-150 ease-in-out"
+									/>
+									<input
+										type="number"
+										value={newMaxGrade}
+										onChange={(e) => setNewMaxGrade(e.target.value)}
+										placeholder="Max Grade"
+										className="w-full p-4 text-xl font-medium text-white bg-transparent border-2 rounded-lg placeholder-purple-300 border-purple-500 focus:border-purple-700 focus:bg-dark-500 focus:outline-none transition duration-150 ease-in-out"
+									/>
+									<button
+										type="submit"
+										className="text-white bg-gradient-to-r from-buttonPurple to-buttonOrange hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
+									>
+										Add Assessment
+									</button>
+								</div>
+							</form>
+						</>
 					)}
 				</div>
 			</div>
