@@ -273,7 +273,7 @@ const AdvisorPage = () => {
 };
 
 function Banner({ userName }) {
-	const today = new Date(); // Ensure today is a Date object
+	const today = new Date();
 	return (
 		<div className="bg-bannerColor h-64 rounded-3xl p-12 flex flex-row items-center justify-between">
 			<div className="h-full flex flex-col space-y-12 mr-8 pl-8">

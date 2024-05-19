@@ -312,7 +312,7 @@ export default function StudentPage() {
 
 				<div className="h-12"></div>
 
-				<div className="w-8/12">
+				<div className="w-10/12 mx-auto">
 					<div className="flex flex-row items-center space-x-12">
 						<h2 className="text-white text-2xl">Subject: </h2>
 						<div className="relative inline-flex">
@@ -419,7 +419,7 @@ export default function StudentPage() {
 					{selectedSubject && (
 						<>
 							<div className="text-center justify-center items-center p-12 text-white text-2xl ">
-								<h3>Add the Assessment: </h3>
+								<h3>Add Assessment: </h3>
 							</div>
 							<form onSubmit={handleNewAssessmentSubmit} className="my-8">
 								<div className="flex flex-col space-y-4">
@@ -468,12 +468,7 @@ function Banner({ userName }) {
 				<h5 className="text-white/50 text-xl">{formatDate(today)}</h5>
 			</div>
 			<div>
-				<img
-					src="https://firebasestorage.googleapis.com/v0/b/realtimedatabasetest-f226a.appspot.com/o/bannerIllustrate.png?alt=media"
-					alt=""
-					width={500}
-					height={500}
-				/>
+				<img src="assets/laptopicon.svg" alt="" width={500} height={500} />
 			</div>
 		</div>
 	);
