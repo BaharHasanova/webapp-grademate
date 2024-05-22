@@ -57,12 +57,17 @@ const AdvisorPage = () => {
 				try {
 					const response = await Axios.get(
 						"http://127.0.0.1:5000/grademate/advisor/students",
-						{
-							params: { advisor_id: advisorId },
-						}
+						{ params: { advisor_id: advisorId } }
 					);
 					console.log("Advisees data:", response.data);
 					setAdvisees(response.data);
+					if (response.data.length > 0) {
+						const firstAdvisee = response.data[0];
+						setSelectedAdvisee(firstAdvisee.student_id);
+						if (firstAdvisee.current_semester) {
+							setSemesterId(firstAdvisee.current_semester.toString());
+						}
+					}
 				} catch (error) {
 					console.error("Failed to fetch advisees:", error);
 				}
@@ -72,28 +77,25 @@ const AdvisorPage = () => {
 	}, [advisorId]);
 
 	useEffect(() => {
-		if (selectedAdvisee) {
-			const fetchSemesters = async () => {
-				try {
-					const response = await Axios.get(
-						"http://127.0.0.1:5000/grademate/advisor/student/semesters",
-						{ params: { student_id: selectedAdvisee } }
-					);
-					setSemesters(response.data);
-					setSemesterId("");
-					setSubjects([]);
-				} catch (error) {
-					console.error("Failed to fetch semesters:", error);
-					setSemesters([]);
-					setSubjects([]);
-				}
-			};
-			fetchSemesters();
-		} else {
-			setSemesters([]);
-			setSubjects([]);
+		const currentAdvisee = advisees.find(a => a.student_id === selectedAdvisee);
+		if (currentAdvisee && currentAdvisee.current_semester) {
+			setSemesterId(currentAdvisee.current_semester.toString());
 		}
-	}, [selectedAdvisee]);
+
+		const fetchSemesters = async () => {
+			try {
+				const response = await Axios.get(
+					"http://127.0.0.1:5000/grademate/advisor/student/semesters",
+					{ params: { student_id: selectedAdvisee } }
+				);
+				setSemesters(response.data);
+			} catch (error) {
+				console.error("Failed to fetch semesters:", error);
+				setSemesters([]);
+			}
+		};
+		fetchSemesters();
+	}, [selectedAdvisee, advisees]);
 
 	useEffect(() => {
 		if (selectedSemester) {
@@ -121,13 +123,14 @@ const AdvisorPage = () => {
 			setAssessments([]);
 			setIsLoading(true);
 			setError("");
-
+			setGradePercentage(0);  // Reset to 0 before fetching new data
+	
 			try {
 				const assessmentsResponse = await Axios.get(
 					"http://127.0.0.1:5000/grademate/subject/assessments",
 					{ params: { subject_id: selectedSubject } }
 				);
-
+	
 				const gradesResponse = await Axios.get(
 					"http://127.0.0.1:5000/grademate/student/assessment_grades",
 					{
@@ -137,24 +140,22 @@ const AdvisorPage = () => {
 						},
 					}
 				);
-
-				const combinedAssessments = assessmentsResponse.data.map(
-					(assessment) => {
-						const achievedGradeData = gradesResponse.data[1].find(
-							(grade) => grade.assessment_id === assessment.assessment_id
-						);
-						return {
-							type: assessment.type,
-							max_grade: `${assessment.max_grade}`,
-							achievedGrade: achievedGradeData
-								? achievedGradeData.achieved_grade
-								: "N/A",
-						};
-					}
-				);
-
+	
+				const combinedAssessments = assessmentsResponse.data.map((assessment) => {
+					const achievedGradeData = gradesResponse.data[1].find(
+						(grade) => grade.assessment_id === assessment.assessment_id
+					);
+					return {
+						type: assessment.type,
+						max_grade: `${assessment.max_grade}`,
+						achievedGrade: achievedGradeData
+							? achievedGradeData.achieved_grade
+							: "N/A",
+					};
+				});
+	
 				setAssessments(combinedAssessments);
-				setGradePercentage(gradesResponse.data[0].grade_percentage);
+				setGradePercentage(gradesResponse.data[0].grade_percentage || 0);  // Use 0 if undefined
 				setShowGrades(true);
 			} catch (error) {
 				console.error("Failed to fetch assessments:", error);
@@ -205,15 +206,16 @@ const AdvisorPage = () => {
 						<h2 className="text-white mb-6 text-2xl">Semester: </h2>
 						<select
 							id="semester-select"
+							value={selectedSemester}
 							onChange={(e) => setSemesterId(e.target.value)}
 							className="select-style"
 							disabled={!selectedAdvisee}
 						>
-							<option value="" disabled selected>
+							<option value="" disabled>
 								Select Semester
 							</option>
 							{semesters.map((semester) => (
-								<option key={semester.semester_id} value={semester.semester_id}>
+								<option key={semester.semester_id} value={semester.semester_id.toString()}>
 									{semester.name}
 								</option>
 							))}
@@ -254,19 +256,16 @@ const AdvisorPage = () => {
 					</div>
 				</div>
 
-				{showGrades && (
+				showGrades && (
 					<div className="flex flex-wrap justify-around items-start mt-12">
-						<div
-							className="w-full md:w-[60%] mt-20"
-							style={{ minHeight: "500px" }}
-						>
+						<div className="w-full md:w-[60%] mt-20" style={{ minHeight: "500px" }}>
 							<GradesTable grades={assessments} />
 						</div>
 						<div style={{ width: "330px", height: "330px", marginTop: "0px" }}>
 							<GradePercentage percentage={gradePercentage} />
 						</div>
 					</div>
-				)}
+				)
 			</div>
 		</div>
 	);

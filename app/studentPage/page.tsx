@@ -22,6 +22,11 @@ interface ClassCode {
 	name: string;
 }
 
+interface DecodedToken {
+	name: string;
+	student_id: string;
+}
+
 export default function StudentPage() {
 	const [file, setFile] = useState(null);
 	const [responseMessage, setResponseMessage] = useState("");
@@ -63,9 +68,9 @@ export default function StudentPage() {
 	}, [selectedAssessment]);
 
 	useEffect(() => {
-		// Assuming the student ID can be retrieved from the decoded token
-
+		// Fetch class codes based on student ID
 		const fetchClassCodes = async () => {
+			if (!studentId) return;
 			try {
 				const response = await Axios.get(
 					"http://127.0.0.1:5000/grademate/student/class_code",
@@ -79,22 +84,21 @@ export default function StudentPage() {
 		};
 
 		fetchClassCodes();
-	}, [studentId]); // Empty dependency array ensures this runs once on component mount
+	}, [studentId]); // Re-fetch when studentId changes
 
 	const fetchAssessmentsTable = async () => {
 		if (selectedSubject && studentId) {
 			setAssessments([]);
 			setIsLoading(true); // Start loading
 			setError(""); // Clear previous errors
-
+			setGradePercentage(0); // Reset to 0 before fetching new data
+	
 			try {
-				// Fetch the assessment structure
 				const assessmentsResponse = await Axios.get(
 					"http://127.0.0.1:5000/grademate/subject/assessments",
 					{ params: { subject_id: selectedSubject } }
 				);
-
-				// Fetch the achieved grades
+	
 				const gradesResponse = await Axios.get(
 					"http://127.0.0.1:5000/grademate/student/assessment_grades",
 					{
@@ -104,29 +108,24 @@ export default function StudentPage() {
 						},
 					}
 				);
-
-				// Combine both results
-				const combinedAssessments = assessmentsResponse.data.map(
-					(assessment) => {
-						const achievedGradeData = gradesResponse.data[1].find(
-							(grade) => grade.assessment_id === assessment.assessment_id
-						);
-						return {
-							assessment_id: assessment.assesment_id,
-							type: assessment.type,
-							max_grade: `${assessment.max_grade}`,
-							achievedGrade: achievedGradeData
-								? achievedGradeData.achieved_grade
-								: "-", // Show "N/A" if no grade is found
-						};
-					}
-				);
-
+	
+				const combinedAssessments = assessmentsResponse.data.map((assessment) => {
+					const achievedGradeData = gradesResponse.data[1].find(
+						(grade) => grade.assessment_id === assessment.assessment_id
+					);
+					return {
+						assessment_id: assessment.assessment_id,
+						type: assessment.type,
+						max_grade: `${assessment.max_grade}`,
+						achievedGrade: achievedGradeData
+							? achievedGradeData.achieved_grade
+							: "-", // Show "N/A" if no grade is found
+					};
+				});
+	
 				setAssessments(combinedAssessments);
-
-				// Update the grade percentage if present
-				setGradePercentage(gradesResponse.data[0].grade_percentage);
-
+				setGradePercentage(gradesResponse.data[0].grade_percentage || 0); // Use backend data or 0 if undefined
+	
 				setShowGrades(true); // Show grades table and percentage
 			} catch (error) {
 				console.error("Failed to fetch assessments:", error);
@@ -164,47 +163,43 @@ export default function StudentPage() {
 			alert("Please select an assessment and enter a grade.");
 			return;
 		}
-
+	
 		setIsLoading(true); // Start loading
 		setError(""); // Clear previous errors
-
-		// SAVE THE GRADES
+	
 		try {
-			console.log("BELOW ARE VARIABLES");
-			console.log(studentId);
-			console.log(selectedAssessment);
-			console.log(newGrade);
-			const response = await fetch(
-				"http://127.0.0.1:5000/grademate/grade/save_grade",
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ studentId, selectedAssessment, newGrade }),
-					// student_id: studentId,
-					// assessment_id: selectedAssessment,
-					// achieved_grade: newGrade,
-				}
-			);
-
+			const response = await fetch("http://127.0.0.1:5000/grademate/grade/save_grade", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					studentId: studentId,
+					selectedAssessment: selectedAssessment,
+					newGrade: newGrade
+				}),
+			});
+	
+			const data = await response.json();
+	
 			if (response.status === 200) {
 				console.log("Grade saved successfully");
 				fetchAssessmentsTable(); // Fetch the updated table data
 				setNewGrade(""); // Reset the new grade input
 				setSelectedAssessment(""); // Reset the selected assessment
 			} else {
-				console.error("Failed to save grade: ", response.status);
-				setError("Failed to save grade."); // Set an error message
+				console.error("Failed to save grade:", data.error || "An error occurred");
+				setError(data.error || "Failed to save grade."); // Set an error message
+				alert(data.error || "Failed to save grade."); // Display an alert with the error
 			}
 		} catch (error) {
 			console.error("Error saving grade:", error);
 			setError("Error saving grade."); // Set an error message
+			alert("Error saving grade."); // Display an alert with the error
 		}
-
+	
 		setIsLoading(false); // End loading
 	};
-
 	// Function to handle the submission of the new assessment
 	const handleNewAssessmentSubmit = async (e) => {
 		e.preventDefault();
@@ -249,50 +244,6 @@ export default function StudentPage() {
 			console.error("Error adding assessment:", error);
 		}
 	};
-
-	// Toggle dropdown function
-	// const toggleDropdown = () => {
-	//   setIsDropdownOpen(!isDropdownOpen);
-	// };
-
-	// const handleFileChange = (event: any) => {
-	//   const selectedFile = event.target.files[0];
-	//   setFile(selectedFile);
-	//   handleSubmit(event);
-	// };
-
-	// const handleSubmit = async (event: any) => {
-	//   event.preventDefault();
-
-	//   if (!file) {
-	//     console.log("No file selected");
-	//     return;
-	//   }
-
-	//   const formData = new FormData();
-	//   formData.append("file", file);
-
-	//   try {
-	//     const response = await fetch("http://127.0.0.1:5000/grademate/upload", {
-	//       method: "POST",
-	//       body: formData,
-	//     });
-
-	//     if (response.ok) {
-	//       const responseData = await response.json();
-	//       console.log(responseData);
-	//       setColumns(responseData.columns);
-	//       setData(responseData.data);
-
-	//       setResponseMessage(responseData);
-	//       console.log("File uploaded successfully");
-	//     } else {
-	//       console.error("Failed to upload file");
-	//     }
-	//   } catch (error) {
-	//     console.error("Error uploading file:", error);
-	//   }
-	// };
 
 	return (
 		<div
@@ -381,10 +332,16 @@ export default function StudentPage() {
 						{/* Input field for new grade and Save button */}
 						{selectedAssessment && (
 							<div>
+							<div>
 								<input
 									type="number"
 									value={newGrade}
-									onChange={(e) => setNewGrade(e.target.value)}
+									onChange={(e) => {
+										const value = Math.min(100, Math.max(0, parseInt(e.target.value, 10)));
+										if (!isNaN(value)) {
+											setNewGrade(value.toString());
+										}
+									}}
 									placeholder="Enter achieved grade"
 									className="w-full p-4 text-xl font-medium text-white bg-transparent border-2 rounded-lg placeholder-purple-300 border-purple-500 focus:border-purple-700 focus:bg-dark-500 focus:outline-none transition duration-150 ease-in-out"
 								/>
@@ -397,23 +354,17 @@ export default function StudentPage() {
 									Save Grade
 								</button>
 							</div>
+							<div className="h-14"></div>
+					
+							<button
+								onClick={saveGrade}
+								className="text-white bg-gradient-to-r from-buttonPurple to-buttonOrange hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
+							>
+								Save Grade
+							</button>
+						</div>
 						)}
 					</div>
-
-					{/* <div className="h-14"></div>
-          <label
-            htmlFor="fileInput"
-            className="w-full text-white bg-gradient-to-r from-buttonPurple to-buttonOrange hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
-          >
-            Upload
-          </label>
-          <input
-            type="file"
-            id="fileInput"
-            onChange={handleFileChange}
-            style={{ display: "none" }} // Keeps the input hidden
-          />
-          <>{data && columns && <Table data={data} columns={columns} />}</> */}
 
 					{/* Form to add a new assessment */}
 					{selectedSubject && (
