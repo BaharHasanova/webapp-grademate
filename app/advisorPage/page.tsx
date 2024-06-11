@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
+import { useRouter, usePathname } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import Axios from "axios";
 import GradesTable from "../Components/GradesTable";
 import GradePercentage from "../Components/GradesPercentage";
+import RegisterComponent from "../Components/Register";
 
 // Utility function to format the date
 const formatDate = (date: Date) => {
@@ -42,6 +44,59 @@ const AdvisorPage = () => {
 	const [gradePercentage, setGradePercentage] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState("");
+	const router = useRouter();
+	const [currentView, setCurrentView] = useState("dashboard");
+	const [searchTerm, setSearchTerm] = useState("");
+	const [data, setData] = useState([]);
+
+    const handleNewData = (newData) => {
+        setData(newData);
+        console.log("New data received:", newData);
+    };
+
+	const handleRowClick = (studentId: string) => {
+		setSelectedAdvisee(studentId);
+		setCurrentView("advisees");
+	};
+
+	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchTerm(e.target.value);
+	};
+
+	const [currentPage, setCurrentPage] = useState(1);
+	const adviseesPerPage = 10; // You can change this number to your preferred items per page
+	const filteredAdvisees = advisees.filter((advisee) =>
+		advisee.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+	);
+
+	const indexOfLastAdvisee = currentPage * adviseesPerPage;
+	const indexOfFirstAdvisee = indexOfLastAdvisee - adviseesPerPage;
+	const currentAdvisees = filteredAdvisees.slice(
+		indexOfFirstAdvisee,
+		indexOfLastAdvisee
+	);
+
+	const nextPage = () => {
+		if (currentPage < Math.ceil(filteredAdvisees.length / adviseesPerPage)) {
+			setCurrentPage(currentPage + 1);
+		}
+	};
+
+	const prevPage = () => {
+		if (currentPage > 1) {
+			setCurrentPage(currentPage - 1);
+		}
+	};
+
+	useEffect(() => {
+		if (currentView === "advisees" && selectedAdvisee) {
+			const adviseeExists = advisees.some((advisee) => advisee.student_id === selectedAdvisee);
+			if (!adviseeExists && advisees.length > 0) {
+				setSelectedAdvisee(advisees[0].student_id);
+			}
+		}
+	}, [currentView, selectedAdvisee, advisees]);
+
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
@@ -61,11 +116,21 @@ const AdvisorPage = () => {
 					);
 					console.log("Advisees data:", response.data);
 					setAdvisees(response.data);
+	
 					if (response.data.length > 0) {
-						const firstAdvisee = response.data[0];
-						setSelectedAdvisee(firstAdvisee.student_id);
-						if (firstAdvisee.current_semester) {
-							setSemesterId(firstAdvisee.current_semester.toString());
+						if (selectedAdvisee) {
+							const adviseeExists = response.data.some(
+								(advisee) => advisee.student_id === selectedAdvisee
+							);
+							if (!adviseeExists) {
+								setSelectedAdvisee(response.data[0].student_id);
+							}
+						} else {
+							setSelectedAdvisee(response.data[0].student_id);
+						}
+	
+						if (response.data[0].current_semester) {
+							setSemesterId(response.data[0].current_semester.toString());
 						}
 					}
 				} catch (error) {
@@ -74,7 +139,7 @@ const AdvisorPage = () => {
 			};
 			fetchAdvisees();
 		}
-	}, [advisorId]);
+	}, [advisorId, selectedAdvisee]);
 
 	useEffect(() => {
 		const currentAdvisee = advisees.find(a => a.student_id === selectedAdvisee);
@@ -154,6 +219,9 @@ const AdvisorPage = () => {
 					};
 				});
 	
+				console.log("Combined Assessments:", combinedAssessments); // Debugging
+				console.log("Grade Percentage:", gradesResponse.data[0].grade_percentage || 0); // Debugging
+	
 				setAssessments(combinedAssessments);
 				setGradePercentage(gradesResponse.data[0].grade_percentage || 0);  // Use 0 if undefined
 				setShowGrades(true);
@@ -162,6 +230,12 @@ const AdvisorPage = () => {
 				setError("Failed to load data.");
 			}
 			setIsLoading(false);
+		}
+	};
+
+	const handleLogout = () => {
+		if (window.confirm("Are you sure you want to logout?")) {
+			router.push("/");
 		}
 	};
 
@@ -179,93 +253,266 @@ const AdvisorPage = () => {
 				userName="Advisor"
 			/>
 
-			<div className="mx-24">
-				<div className="h-12"></div>
+		<div className="flex flex-row h-full p-8 space-x-4">
+			<aside className="w-64 bg-bannerColor rounded-3xl space-y-2 p-12 overflow-auto">
+					<div className="w-40 h-40 bg-gradient-to-t from-squareGradientDark to-squareGradientLight rounded-3xl mt-4 flex items-center justify-center">
+						<img src="/assets/archive-icon.png" alt="" width={70} height={70} />
+					</div>
+					<a
+						onClick={() => setCurrentView("dashboard")}
+						className={`sidebar-link text-2xl flex items-center py-4 rounded hover:bg-lightPurple cursor-pointer ${
+							currentView === "dashboard" ? "active" : ""
+						}`}
+					>
+						<img className="h-8 w-8 mr-2" src="/assets/dashboard.svg" alt="" />
+						Dashboard
+					</a>
+					<a
+						onClick={() => setCurrentView("registration")}
+						className={`sidebar-link text-2xl flex items-center py-4 rounded hover:bg-lightPurple cursor-pointer ${
+							currentView === "registration" ? "active" : ""
+						}`}
+					>
+						<i className="fas fa-user-plus mr-2"></i>
+						Registration
+					</a>
+					<a
+						onClick={() => setCurrentView("advisees")}
+						className={`sidebar-link text-2xl flex items-center py-4 rounded hover:bg-lightPurple cursor-pointer ${
+							currentView === "advisees" ? "active" : ""
+						}`}
+					>
+						<i className="fas fa-user-friends mr-2"></i>
+						Advisees
+					</a>
+					<a
+						onClick={handleLogout}
+						className="sidebar-link text-2xl flex items-center text-gray-300 py-4 rounded hover:bg-lightPurple"
+					>
+						<img className="h-8 w-8 mr-2" src="/assets/logout.svg" alt="" />
+						Logout
+					</a>
+				</aside>
+				<main className="flex-1 p-8 bg-white bg-opacity-5 rounded-3xl shadow-lg">
+				
 				<Banner userName="Advisor" />
-
-				<div className="mx-24 mt-8 flex justify-between items-end">
-					<div className="select-container">
-						<h2 className="text-white mb-6 text-2xl">Student Name: </h2>
-						<select
-							id="advisee-select"
-							onChange={(e) => setSelectedAdvisee(e.target.value)}
-							defaultValue={""}
-							className="select-style"
-						>
-							<option value="" disabled>
-								Select Your Advisee
-							</option>
-							{advisees.map((advisee) => (
-								<option key={advisee.student_id} value={advisee.student_id}>
-									{advisee.full_name}
-								</option>
-							))}
-						</select>
-					</div>
-					<div className="select-container">
-						<h2 className="text-white mb-6 text-2xl">Semester: </h2>
-						<select
-							id="semester-select"
-							value={selectedSemester}
-							onChange={(e) => setSemesterId(e.target.value)}
-							className="select-style"
-							disabled={!selectedAdvisee}
-						>
-							<option value="" disabled>
-								Select Semester
-							</option>
-							{semesters.map((semester) => (
-								<option key={semester.semester_id} value={semester.semester_id.toString()}>
-									{semester.name}
-								</option>
-							))}
-						</select>
-					</div>
-					<div className="select-container">
-						<h2 className="text-white mb-6 text-2xl">Subject Name: </h2>
-						<select
-							id="subject-select"
-							onChange={(e) => setSelectedSubject(e.target.value)}
-							defaultValue={""}
-							className="select-style"
-							disabled={!selectedSemester}
-						>
-							<option value="" disabled>
-								Select Subject
-							</option>
-							{subjects.map((subject) => (
-								<option key={subject.semester_id} value={subject.subject_id}>
-									{subject.name}
-								</option>
-							))}
-						</select>
-					</div>
-					<div className="button-container">
-						{selectedSubject && (
-							<div className="flex flex-col ml-4 mb-6 w-full">
-								<button
-									onClick={fetchAssessments}
-									className="py-3 px-10 text-white bg-gradient-to-r from-purple-600 to-customTurquoise hover:bg-gradient-to-br font-bold rounded disabled:bg-blue-300"
-									style={{ maxWidth: "250px" }}
-									disabled={!selectedSubject || isLoading}
+				{currentView === "advisees" && (
+					<>
+						<div className="mx-24 mt-8 flex justify-between items-end">
+							<div className="select-container">
+								<h2 className="text-white mb-6 text-2xl">Student Name: </h2>
+								<select
+									id="advisee-select"
+									value={selectedAdvisee} // Use value to control the selected option
+									onChange={(e) => setSelectedAdvisee(e.target.value)}
+									className="select-style"
 								>
-									{isLoading ? "Loading..." : "View Grades"}
-								</button>
+									<option value="" disabled>
+										Select Your Advisee
+									</option>
+									{advisees.map((advisee) => (
+										<option key={advisee.student_id} value={advisee.student_id}>
+											{advisee.full_name}
+										</option>
+									))}
+								</select>
+							</div>
+							<div className="select-container">
+								<h2 className="text-white mb-6 text-2xl">Semester: </h2>
+								<select
+									id="semester-select"
+									value={selectedSemester}
+									onChange={(e) => setSemesterId(e.target.value)}
+									className="select-style"
+									disabled={!selectedAdvisee}
+								>
+									<option value="" disabled>
+										Select Semester
+									</option>
+									{semesters.map((semester) => (
+										<option key={semester.semester_id} value={semester.semester_id.toString()}>
+											{semester.name}
+										</option>
+									))}
+								</select>
+							</div>
+							<div className="select-container">
+								<h2 className="text-white mb-6 text-2xl">Subject Name: </h2>
+								<select
+									id="subject-select"
+									onChange={(e) => setSelectedSubject(e.target.value)}
+									defaultValue={""}
+									className="select-style"
+									disabled={!selectedSemester}
+								>
+									<option value="" disabled>
+										Select Subject
+									</option>
+									{subjects.map((subject) => (
+										<option key={subject.semester_id} value={subject.subject_id}>
+											{subject.name}
+										</option>
+									))}
+								</select>
+							</div>
+							<div className="button-container">
+								{selectedSubject && (
+									<div className="flex flex-col ml-4 mb-6 w-full">
+										<button
+											onClick={fetchAssessments}
+											className="py-3 px-10 text-white bg-gradient-to-r from-purple-600 to-customTurquoise hover:bg-gradient-to-br font-bold rounded disabled:bg-blue-300"
+											style={{ maxWidth: "250px" }}
+											disabled={!selectedSubject || isLoading}
+										>
+											{isLoading ? "Loading..." : "View Grades"}
+										</button>
+									</div>
+								)}
+							</div>
+						</div>
+						{showGrades && (
+							<div className="flex flex-wrap justify-around items-start mt-12">
+								<div className="w-full md:w-[60%] mt-20" style={{ minHeight: "500px" }}>
+									<GradesTable grades={assessments} />
+								</div>
+								<div style={{ width: "330px", height: "330px", marginTop: "0px" }}>
+									<GradePercentage percentage={gradePercentage} />
+								</div>
 							</div>
 						)}
-					</div>
-				</div>
+					</>
+				)}
+				{currentView === "dashboard" && (
+						<>
+							<div className="m-4 flex justify-between items-center">
+								<div className="relative">
+									<input
+										type="text"
+										placeholder="Search by Name"
+										value={searchTerm}
+										onChange={handleSearchChange}
+										className="p-2 border border-gray-300 rounded-xl bg-transparent text-white w-64 pr-10"
+									/>
+									<span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+										<i className="fas fa-search text-white"></i>
+									</span>
+								</div>
 
-				showGrades && (
-					<div className="flex flex-wrap justify-around items-start mt-12">
-						<div className="w-full md:w-[60%] mt-20" style={{ minHeight: "500px" }}>
-							<GradesTable grades={assessments} />
-						</div>
-						<div style={{ width: "330px", height: "330px", marginTop: "0px" }}>
-							<GradePercentage percentage={gradePercentage} />
-						</div>
-					</div>
-				)
+								<button
+									className="bg-gradient-to-r from-purple-500 to-red-500 text-white py-2 px-4 rounded-lg"
+									onClick={() => console.log("Button clicked")}
+								>
+									Add New
+								</button>
+							</div>
+							<div className="overflow-x-auto shadow-md rounded-lg">
+								<table className="min-w-full bg-gray-800 text-white">
+									<thead>
+										<tr>
+											<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">
+												#
+											</th>
+											<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">
+												Student ID
+											</th>
+											<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">
+												Name
+											</th>
+											<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">
+												Email
+											</th>
+											<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">
+												Status
+											</th>
+											<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">
+												CGPA
+											</th>
+											<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">
+												GPA
+											</th>
+											<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">
+												Semester
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										{currentAdvisees.map((advisee, index) => (
+											<tr
+												key={advisee.student_id}
+												className="hover:bg-gray-700 cursor-pointer"
+												onClick={() => handleRowClick(advisee.student_id)}
+											>
+												<td className="px-6 py-4 border-b border-gray-700">
+													{index + 1 + indexOfFirstAdvisee}
+												</td>
+												<td className="px-6 py-4 border-b border-gray-700">
+													{advisee.student_id}
+												</td>
+												<td className="px-6 py-4 border-b border-gray-700">
+													{advisee.full_name}
+												</td>
+												<td className="px-6 py-4 border-b border-gray-700">
+													{advisee.email}
+												</td>
+												<td className="px-6 py-4 border-b border-gray-700">
+													{advisee.status ? "Active" : "Inactive"}
+												</td>
+												<td className="px-6 py-4 border-b border-gray-700">
+													{advisee.cgpa || "N/A"}
+												</td>
+												<td className="px-6 py-4 border-b border-gray-700">
+													{advisee.gpa || "N/A"}
+												</td>
+												<td className="px-6 py-4 border-b border-gray-700">
+													{advisee.current_semester || "N/A"}
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+							<div className="mt-4 flex justify-center items-center space-x-2">
+								<button
+									onClick={prevPage}
+									disabled={currentPage === 1}
+									className={`p-2 border border-gray-300 rounded ${
+										currentPage === 1 ? "cursor-not-allowed opacity-50" : ""
+									} text-white`}
+								>
+									<i className="fas fa-arrow-left"></i>
+								</button>
+								{[...Array(Math.ceil(filteredAdvisees.length / adviseesPerPage)).keys()].map((number) => (
+									<button
+										key={number + 1}
+										onClick={() => setCurrentPage(number + 1)}
+										className={`p-2 border border-gray-300 rounded ${
+											currentPage === number + 1 ? "bg-gray-500" : "bg-gray-800"
+										} text-white`}
+									>
+										{number + 1}
+									</button>
+								))}
+								<button
+									onClick={nextPage}
+									disabled={currentPage === Math.ceil(filteredAdvisees.length / adviseesPerPage)}
+									className={`p-2 border border-gray-300 rounded ${
+										currentPage === Math.ceil(filteredAdvisees.length / adviseesPerPage)
+											? "cursor-not-allowed opacity-50"
+											: ""
+									} text-white`}
+								>
+									<i className="fas fa-arrow-right"></i>
+								</button>
+							</div>
+						</>
+					)}
+				{currentView === "registration" && (
+					<RegisterComponent onNewData={handleNewData}  />
+				)}
+					{/* : currentView === "registration" ? (
+						
+					) : null */}
+				</main>
 			</div>
 		</div>
 	);
