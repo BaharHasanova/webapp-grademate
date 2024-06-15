@@ -267,28 +267,22 @@ export default function StudentPage() {
 					<div className="flex flex-row items-center space-x-12">
 						<h2 className="text-white text-2xl">Subject: </h2>
 						<div className="relative inline-flex">
-							<select
-								id="subject-select"
-								onChange={(e) => {
-									setSelectedSubject(e.target.value);
-									// Reset assessments when a new subject is selected
-									setSelectedAssessment("");
-									setGrades([]);
-								}}
-								className="select-style"
-							>
-								<option value="" disabled selected hidden>
-									Select Your Subject
+						<select
+							id="subject-select"
+							value={selectedSubject}
+							onChange={(e) => {
+								console.log("Selected Subject Changed:", e.target.value);
+								setSelectedSubject(e.target.value);
+							}}
+							className="select-style"
+						>
+							<option value="" disabled hidden>Select Your Subject</option>
+							{classCodes.map((classCode) => (
+								<option key={classCode.subject_id} value={classCode.subject_id}>
+									{classCode.name}
 								</option>
-								{classCodes.map((classCode) => (
-									<option
-										key={classCode.subject_id}
-										value={classCode.subject_id}
-									>
-										{classCode.name}
-									</option>
-								))}
-							</select>
+							))}
+						</select>
 						</div>
 					</div>
 
@@ -356,12 +350,12 @@ export default function StudentPage() {
 							</div>
 							<div className="h-14"></div>
 					
-							<button
+							{/* <button
 								onClick={saveGrade}
 								className="text-white bg-gradient-to-r from-buttonPurple to-buttonOrange hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
 							>
 								Save Grade
-							</button>
+							</button> */}
 						</div>
 						)}
 					</div>

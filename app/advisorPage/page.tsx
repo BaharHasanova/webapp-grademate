@@ -143,45 +143,68 @@ const AdvisorPage = () => {
 
 	useEffect(() => {
 		const currentAdvisee = advisees.find(a => a.student_id === selectedAdvisee);
-		if (currentAdvisee && currentAdvisee.current_semester) {
-			setSemesterId(currentAdvisee.current_semester.toString());
+		if (currentAdvisee) {
+			const fetchSemesters = async () => {
+				try {
+					const response = await Axios.get(
+						`http://127.0.0.1:5000/grademate/advisor/student/semesters`,
+						{ params: { student_id: selectedAdvisee } }
+					);
+					setSemesters(response.data);
+					if (response.data.length > 0) {
+						// Set the selectedSemester to the first semester of the new advisee
+						setSemesterId(response.data[0].semester_id.toString());
+					} else {
+						// If no semesters found, reset selectedSemester
+						setSemesterId('');
+					}
+				} catch (error) {
+					console.error("Failed to fetch semesters:", error);
+					setSemesters([]);
+					setSemesterId(''); // Reset if there's an error fetching
+				}
+			};
+			fetchSemesters();
 		}
-
-		const fetchSemesters = async () => {
-			try {
-				const response = await Axios.get(
-					"http://127.0.0.1:5000/grademate/advisor/student/semesters",
-					{ params: { student_id: selectedAdvisee } }
-				);
-				setSemesters(response.data);
-			} catch (error) {
-				console.error("Failed to fetch semesters:", error);
-				setSemesters([]);
-			}
-		};
-		fetchSemesters();
 	}, [selectedAdvisee, advisees]);
 
 	useEffect(() => {
-		if (selectedSemester) {
-			const fetchSubjects = async () => {
-				setSubjects([]);
+		let isMounted = true; // This will help in avoiding setting state on unmounted component
+	
+		const fetchSubjects = async () => {
+			if (selectedSemester) { // Ensure there's a selected semester
+				setIsLoading(true); // Indicate loading subjects
 				try {
 					const response = await Axios.get(
-						"http://127.0.0.1:5000/grademate/advisor/student/semester/classes",
+						`http://127.0.0.1:5000/grademate/advisor/student/semester/classes`,
 						{ params: { semester_id: selectedSemester } }
 					);
-					setSubjects(response.data);
+					if (isMounted) {
+						setSubjects(response.data); // Set subjects only if component is still mounted
+					}
 				} catch (error) {
 					console.error("Failed to fetch subjects:", error);
-					setSubjects([]);
+					if (isMounted) {
+						setSubjects([]); // Handle error in fetching subjects
+					}
+				} finally {
+					if (isMounted) {
+						setIsLoading(false); // Ensure to turn off loading indicator
+					}
 				}
-			};
-			fetchSubjects();
-		} else {
-			setSubjects([]);
-		}
-	}, [selectedSemester]);
+			} else {
+				if (isMounted) {
+					setSubjects([]); // Reset subjects if semester is not selected
+				}
+			}
+		};
+	
+		fetchSubjects();
+	
+		return () => {
+			isMounted = false; // Cleanup function to mark component as unmounted
+		};
+	}, [selectedSemester]); // Only re-run the effect if selectedSemester changes
 
 	const fetchAssessments = async () => {
 		if (selectedSubject && selectedAdvisee) {
