@@ -8,6 +8,8 @@ import Axios from "axios";
 import GradesTable from "../Components/GradesTable";
 import GradePercentage from "../Components/GradesPercentage";
 import RegisterComponent from "../Components/Register";
+import useAuth from '../hooks/useAuth';
+
 
 // Utility function to format the date
 const formatDate = (date: Date) => {
@@ -32,6 +34,8 @@ interface Subject {
 }
 
 const AdvisorPage = () => {
+	useAuth("advisor");
+
 	const [semesters, setSemesters] = useState<Semester[]>([]);
 	const [advisees, setAdvisees] = useState<Advisee[]>([]);
 	const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -48,6 +52,12 @@ const AdvisorPage = () => {
 	const [currentView, setCurrentView] = useState("dashboard");
 	const [searchTerm, setSearchTerm] = useState("");
 	const [data, setData] = useState([]);
+	const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+	const [unassignedStudents, setUnassignedStudents] = useState([]);
+	const [selectedStudent, setSelectedStudent] = useState("");
+	const [unassignedSearchTerm, setUnassignedSearchTerm] = useState("");
+	const [showUnassignedStudents, setShowUnassignedStudents] = useState(false);
+
 
     const handleNewData = (newData) => {
         setData(newData);
@@ -85,6 +95,52 @@ const AdvisorPage = () => {
 	const prevPage = () => {
 		if (currentPage > 1) {
 			setCurrentPage(currentPage - 1);
+		}
+	};
+
+	const fetchUnassignedStudents = async () => {
+		setIsLoading(true);
+		try {
+			const response = await Axios.get("http://127.0.0.1:5000/grademate/advisor/fetch_students");
+			setUnassignedStudents(response.data);
+			setShowUnassignedStudents(true); // Automatically show this view when data is fetched
+		} catch (error) {
+			console.error("Failed to fetch unassigned students:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const filteredUnassignedStudents = unassignedStudents.filter(student =>
+		student.full_name.toLowerCase().includes(unassignedSearchTerm.toLowerCase())
+	);
+	
+
+	const assignStudent = async (studentId) => {
+		if (!studentId) {
+			alert("Please select a student first.");
+			return;
+		}
+	
+		setIsLoading(true);
+	
+		try {
+			const response = await Axios.post("http://127.0.0.1:5000/grademate/advisor/add_advisee", {
+				advisor_id: advisorId,
+				student_id: studentId
+			});
+	
+			if (response.status === 200) {
+				alert("Student assigned successfully.");
+				fetchUnassignedStudents(); // Refetch the list of unassigned students to update the table
+			} else {
+				alert("Failed to assign student. Please try again.");
+			}
+		} catch (error) {
+			console.error("Failed to assign student:", error);
+			alert("Failed to assign student.");
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -421,12 +477,40 @@ const AdvisorPage = () => {
 									</span>
 								</div>
 
-								<button
-									className="bg-gradient-to-r from-purple-500 to-red-500 text-white py-2 px-4 rounded-lg"
-									onClick={() => console.log("Button clicked")}
-								>
-									Add New
-								</button>
+								<div className="m-4 flex justify-between items-center">
+									<button
+										className="bg-gradient-to-r from-purple-500 to-red-500 text-white py-2 px-4 rounded-lg"
+										onClick={() => {
+											fetchUnassignedStudents();
+											setCurrentView("registration");
+										}}
+									>
+										Add New
+									</button>
+								</div>
+
+								{isDropdownVisible && (
+									<div>
+										<select
+											value={selectedStudent}
+											onChange={(e) => setSelectedStudent(e.target.value)}
+											className="select-style"
+										>
+											<option value="">Select a Student</option>
+											{unassignedStudents.map((student) => (
+												<option key={student.student_id} value={student.student_id}>
+													{student.full_name}
+												</option>
+											))}
+										</select>
+										<button
+											className="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+											onClick={assignStudent}
+										>
+											Assign Student
+										</button>
+									</div>
+								)}
 							</div>
 							<div className="overflow-x-auto shadow-md rounded-lg">
 								<table className="min-w-full bg-gray-800 text-white">
@@ -529,9 +613,61 @@ const AdvisorPage = () => {
 							</div>
 						</>
 					)}
-				{currentView === "registration" && (
+					{currentView === "registration" && (
+						<>
+							<RegisterComponent onNewData={handleNewData} />
+							
+							{isLoading ? (
+								<p>Loading...</p>
+							) : (
+								<>
+									<div className="m-4">
+										<input
+											type="text"
+											placeholder="Search by Name"
+											value={unassignedSearchTerm}
+											onChange={e => setUnassignedSearchTerm(e.target.value)}
+											className="p-2 border border-gray-300 rounded-xl bg-transparent text-white w-64 mb-4"
+										/>
+										<div className="overflow-x-auto shadow-md rounded-lg">
+											<table className="min-w-full bg-gray-800 text-white">
+												<thead>
+													<tr>
+														<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">#</th>
+														<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">Student ID</th>
+														<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">Name</th>
+														<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">Email</th>
+														<th className="px-6 py-3 border-b-2 border-gray-700 text-left leading-4 text-gray-300 tracking-wider">Assign</th>
+													</tr>
+												</thead>
+												<tbody>
+													{filteredUnassignedStudents.map((student, index) => (
+														<tr key={student.student_id} className="hover:bg-gray-700 cursor-pointer">
+															<td className="px-6 py-4 border-b border-gray-700">{index + 1}</td>
+															<td className="px-6 py-4 border-b border-gray-700">{student.student_id}</td>
+															<td className="px-6 py-4 border-b border-gray-700">{student.full_name}</td>
+															<td className="px-6 py-4 border-b border-gray-700">{student.email}</td>
+															<td className="px-6 py-4 border-b border-gray-700">
+															<button
+																className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
+																onClick={() => assignStudent(student.student_id)}
+															>
+																Assign
+															</button>
+															</td>
+														</tr>
+													))}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</>
+							)}
+						</>
+					)}
+				{/* {currentView === "registration" && (
 					<RegisterComponent onNewData={handleNewData}  />
-				)}
+				)} */}
 					{/* : currentView === "registration" ? (
 						
 					) : null */}

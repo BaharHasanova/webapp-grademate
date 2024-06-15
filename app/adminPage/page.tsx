@@ -5,6 +5,8 @@ import Navbar from "../Components/Navbar";
 import Axios from "axios";
 import AdminDashboard from "../Components/AdminDashboard"; // Import the AdminDashboard component
 import DropDashboard from "../Components/AdminDrop"; // Import the DropDashboard component
+import useAuth from '../hooks/useAuth';
+
 
 const formatDate = (date: Date) => {
 	const options = { year: "numeric", month: "long", day: "numeric" };
@@ -12,6 +14,7 @@ const formatDate = (date: Date) => {
 };
 
 const AdminPage = () => {
+	useAuth('admin');
 	const [userType, setUserType] = useState("");
 	const [studentData, setStudentData] = useState({
 		student_id: "",

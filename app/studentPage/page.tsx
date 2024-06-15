@@ -5,6 +5,8 @@ import { jwtDecode } from "jwt-decode";
 import Axios from "axios";
 import GradesTable from "../Components/GradesTable";
 import GradePercentage from "../Components/GradesPercentage";
+import useAuth from '../hooks/useAuth';
+
 
 const formatDate = (date: Date) => {
 	const options = { year: "numeric", month: "long", day: "numeric" };
@@ -28,6 +30,8 @@ interface DecodedToken {
 }
 
 export default function StudentPage() {
+	useAuth("student");
+
 	const [file, setFile] = useState(null);
 	const [responseMessage, setResponseMessage] = useState("");
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
