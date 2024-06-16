@@ -203,7 +203,7 @@ const AdvisorPage = () => {
 			const fetchSemesters = async () => {
 				try {
 					const response = await Axios.get(
-						`http://127.0.0.1:5000/grademate/advisor/student/semesters`,
+						`https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/student/semesters`,
 						{ params: { student_id: selectedAdvisee } }
 					);
 					setSemesters(response.data);
@@ -232,7 +232,7 @@ const AdvisorPage = () => {
 				setIsLoading(true); // Indicate loading subjects
 				try {
 					const response = await Axios.get(
-						`http://127.0.0.1:5000/grademate/advisor/student/semester/classes`,
+						`https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/student/semester/classes`,
 						{ params: { semester_id: selectedSemester } }
 					);
 					if (isMounted) {

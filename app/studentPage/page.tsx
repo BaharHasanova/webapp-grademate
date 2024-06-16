@@ -145,7 +145,7 @@ export default function StudentPage() {
 			const fetchAssessments = async () => {
 				try {
 					const response = await Axios.get(
-						`http://127.0.0.1:5000/grademate/subject/assessments`,
+						`https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/subject/assessments`,
 						{ params: { subject_id: selectedSubject } }
 					);
 					setAssessmentsPass(response.data);
@@ -232,7 +232,7 @@ export default function StudentPage() {
 				// Fetch the updated assessments list to include the new assessment
 				const fetchAssessments = async () => {
 					const response = await Axios.get(
-						`http://127.0.0.1:5000/grademate/subject/assessments`,
+						`https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/subject/assessments`,
 						{ params: { subject_id: selectedSubject } }
 					);
 					setAssessmentsPass(response.data);

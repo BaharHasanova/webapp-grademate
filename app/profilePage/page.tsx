@@ -23,7 +23,7 @@ const ProfilePage = () => {
 
     const fetchStudentData = async (studentId) => {
         try {
-            const response = await Axios.get(`http://127.0.0.1:5000/grademate/student/${studentId}`);
+            const response = await Axios.get(`https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/student/${studentId}`);
             setStudentData(response.data.student);
             setProgramName(response.data.program_name);
             setSemester(response.data.semester);
