@@ -14,8 +14,8 @@ const DropDashboard = () => {
 			try {
 				const url =
 					viewType === "students"
-						? "http://127.0.0.1:5000/grademate/student"
-						: "http://127.0.0.1:5000/grademate/advisors";
+						? "https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/student"
+						: "https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisors";
 				const response = await Axios.get(url);
 				setData(response.data);
 			} catch (error) {
@@ -37,8 +37,8 @@ const DropDashboard = () => {
 		try {
 			const url =
 				viewType === "students"
-					? "http://127.0.0.1:5000/grademate/student/drop"
-					: "http://127.0.0.1:5000/grademate/advisor/drop";
+					? "https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/student/drop"
+					: "https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/drop";
 
 			// Prepare payload
 			//   const payload = { ids: selectedUsers };

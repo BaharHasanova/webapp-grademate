@@ -101,7 +101,7 @@ const AdvisorPage = () => {
 	const fetchUnassignedStudents = async () => {
 		setIsLoading(true);
 		try {
-			const response = await Axios.get("http://127.0.0.1:5000/grademate/advisor/fetch_students");
+			const response = await Axios.get("https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/fetch_students");
 			setUnassignedStudents(response.data);
 			setShowUnassignedStudents(true); // Automatically show this view when data is fetched
 		} catch (error) {
@@ -125,7 +125,7 @@ const AdvisorPage = () => {
 		setIsLoading(true);
 	
 		try {
-			const response = await Axios.post("http://127.0.0.1:5000/grademate/advisor/add_advisee", {
+			const response = await Axios.post("https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/add_advisee", {
 				advisor_id: advisorId,
 				student_id: studentId
 			});
@@ -167,7 +167,7 @@ const AdvisorPage = () => {
 			const fetchAdvisees = async () => {
 				try {
 					const response = await Axios.get(
-						"http://127.0.0.1:5000/grademate/advisor/students",
+						"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/students",
 						{ params: { advisor_id: advisorId } }
 					);
 					console.log("Advisees data:", response.data);
@@ -271,12 +271,12 @@ const AdvisorPage = () => {
 	
 			try {
 				const assessmentsResponse = await Axios.get(
-					"http://127.0.0.1:5000/grademate/subject/assessments",
+					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/subject/assessments",
 					{ params: { subject_id: selectedSubject } }
 				);
 	
 				const gradesResponse = await Axios.get(
-					"http://127.0.0.1:5000/grademate/student/assessment_grades",
+					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/student/assessment_grades",
 					{
 						params: {
 							subject_id: selectedSubject,

@@ -16,7 +16,7 @@ const advisorLogin = () => {
     event.preventDefault();
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/grademate/advisor/login",
+        "https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/login",
         {
           method: "POST",
           headers: {
