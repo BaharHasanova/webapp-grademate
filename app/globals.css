@@ -13,7 +13,8 @@
 
 	.sidebar-link {
 		opacity: 0.5;
-		transition: opacity 0.3s ease; /* Smooth transition for opacity change */
+		transition: opacity 0.3s ease, color 0.3s ease; /* Smooth transition for opacity and color change */
+		color: rgba(255, 255, 255, 0.5); /* Default color */
 	}
 
 	.sidebar-link img {
@@ -23,6 +24,12 @@
 	/* Hover state with 100% opacity for text and icons */
 	.sidebar-link:hover,
 	.sidebar-link:hover img {
+		opacity: 1;
+	}
+
+	/* Active state */
+	.sidebar-link.active {
+		color: white;
 		opacity: 1;
 	}
 
@@ -57,11 +64,17 @@
 	}
 
 	.select-container {
-		margin-right: 20px; /* Right margin for spacing between dropdowns */
+		margin-right: 20px;
+		min-height: auto; /* Right margin for spacing between dropdowns */
 	}
 
 	.button-container {
 		margin-left: auto; /* Pushes the button to the right, aligns with the end of the form elements */
 		padding-right: 24px; /* Optional: Right padding for not touching the screen edge */
+	}
+
+	.container {
+		/* Adjust this selector to target the correct element */
+		background-color: #; /* Set this to match your page’s background color */
 	}
 }

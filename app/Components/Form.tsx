@@ -47,7 +47,7 @@ const Form: React.FC<FormProps> = ({
 					<div className="p-8 bg-white/10 backdrop-blur-md rounded-3xl shadow-lg">
 						{/* Form Heading */}
 						<h1 className="text-center text-4xl font-bold text-white mb-4">
-							Welcome to <br /> Advisor Dashboard!
+							Welcome to <br /> Dashboard!
 						</h1>
 						<p className="text-center text-lg text-gray-300 mb-6">
 							login to access your account
@@ -64,7 +64,7 @@ const Form: React.FC<FormProps> = ({
 								<input
 									type="email"
 									id="email"
-									className="w-full p-4 text-2xl text-gray-900 bg-gray-800/50 rounded-lg border border-gray-600 focus:ring-blue-500 focus:border-blue-500"
+									className="w-full p-4 text-2xl text-white bg-gray-800/50 rounded-lg border border-gray-600 focus:ring-blue-500 focus:border-blue-500"
 									placeholder="Email Address"
 									value={email}
 									onChange={onEmailChange}
@@ -82,7 +82,7 @@ const Form: React.FC<FormProps> = ({
 								<input
 									type="password"
 									id="password"
-									className="w-full p-4 text-2xl text-gray-900 bg-gray-800/50 rounded-lg border border-gray-600 focus:ring-blue-500 focus:border-blue-500"
+									className="w-full p-4 text-2xl text-white bg-gray-800/50 rounded-lg border border-gray-600 focus:ring-blue-500 focus:border-blue-500"
 									placeholder="Password"
 									value={password}
 									onChange={onPasswordChange}
@@ -136,7 +136,7 @@ const Form: React.FC<FormProps> = ({
 							<div className="mb-4">
 								<label
 									htmlFor="forgot-password-email"
-									className="block text-gray-700 text-sm font-bold mb-2"
+									className="block text-white text-sm font-bold mb-2"
 								>
 									Enter your email address
 								</label>

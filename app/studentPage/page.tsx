@@ -5,8 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import Axios from "axios";
 import GradesTable from "../Components/GradesTable";
 import GradePercentage from "../Components/GradesPercentage";
-import useAuth from '../hooks/useAuth';
-
+import useAuth from "../hooks/useAuth";
 
 const formatDate = (date: Date) => {
 	const options = { year: "numeric", month: "long", day: "numeric" };
@@ -96,13 +95,13 @@ export default function StudentPage() {
 			setIsLoading(true); // Start loading
 			setError(""); // Clear previous errors
 			setGradePercentage(0); // Reset to 0 before fetching new data
-	
+
 			try {
 				const assessmentsResponse = await Axios.get(
 					"http://127.0.0.1:5000/grademate/subject/assessments",
 					{ params: { subject_id: selectedSubject } }
 				);
-	
+
 				const gradesResponse = await Axios.get(
 					"http://127.0.0.1:5000/grademate/student/assessment_grades",
 					{
@@ -112,24 +111,26 @@ export default function StudentPage() {
 						},
 					}
 				);
-	
-				const combinedAssessments = assessmentsResponse.data.map((assessment) => {
-					const achievedGradeData = gradesResponse.data[1].find(
-						(grade) => grade.assessment_id === assessment.assessment_id
-					);
-					return {
-						assessment_id: assessment.assessment_id,
-						type: assessment.type,
-						max_grade: `${assessment.max_grade}`,
-						achievedGrade: achievedGradeData
-							? achievedGradeData.achieved_grade
-							: "-", // Show "N/A" if no grade is found
-					};
-				});
-	
+
+				const combinedAssessments = assessmentsResponse.data.map(
+					(assessment) => {
+						const achievedGradeData = gradesResponse.data[1].find(
+							(grade) => grade.assessment_id === assessment.assessment_id
+						);
+						return {
+							assessment_id: assessment.assessment_id,
+							type: assessment.type,
+							max_grade: `${assessment.max_grade}`,
+							achievedGrade: achievedGradeData
+								? achievedGradeData.achieved_grade
+								: "-", // Show "N/A" if no grade is found
+						};
+					}
+				);
+
 				setAssessments(combinedAssessments);
 				setGradePercentage(gradesResponse.data[0].grade_percentage || 0); // Use backend data or 0 if undefined
-	
+
 				setShowGrades(true); // Show grades table and percentage
 			} catch (error) {
 				console.error("Failed to fetch assessments:", error);
@@ -167,32 +168,38 @@ export default function StudentPage() {
 			alert("Please select an assessment and enter a grade.");
 			return;
 		}
-	
+
 		setIsLoading(true); // Start loading
 		setError(""); // Clear previous errors
-	
+
 		try {
-			const response = await fetch("http://127.0.0.1:5000/grademate/grade/save_grade", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					studentId: studentId,
-					selectedAssessment: selectedAssessment,
-					newGrade: newGrade
-				}),
-			});
-	
+			const response = await fetch(
+				"http://127.0.0.1:5000/grademate/grade/save_grade",
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						studentId: studentId,
+						selectedAssessment: selectedAssessment,
+						newGrade: newGrade,
+					}),
+				}
+			);
+
 			const data = await response.json();
-	
+
 			if (response.status === 200) {
 				console.log("Grade saved successfully");
 				fetchAssessmentsTable(); // Fetch the updated table data
 				setNewGrade(""); // Reset the new grade input
 				setSelectedAssessment(""); // Reset the selected assessment
 			} else {
-				console.error("Failed to save grade:", data.error || "An error occurred");
+				console.error(
+					"Failed to save grade:",
+					data.error || "An error occurred"
+				);
 				setError(data.error || "Failed to save grade."); // Set an error message
 				alert(data.error || "Failed to save grade."); // Display an alert with the error
 			}
@@ -201,7 +208,7 @@ export default function StudentPage() {
 			setError("Error saving grade."); // Set an error message
 			alert("Error saving grade."); // Display an alert with the error
 		}
-	
+
 		setIsLoading(false); // End loading
 	};
 	// Function to handle the submission of the new assessment
@@ -271,22 +278,27 @@ export default function StudentPage() {
 					<div className="flex flex-row items-center space-x-12">
 						<h2 className="text-white text-2xl">Subject: </h2>
 						<div className="relative inline-flex">
-						<select
-							id="subject-select"
-							value={selectedSubject}
-							onChange={(e) => {
-								console.log("Selected Subject Changed:", e.target.value);
-								setSelectedSubject(e.target.value);
-							}}
-							className="select-style"
-						>
-							<option value="" disabled hidden>Select Your Subject</option>
-							{classCodes.map((classCode) => (
-								<option key={classCode.subject_id} value={classCode.subject_id}>
-									{classCode.name}
+							<select
+								id="subject-select"
+								value={selectedSubject}
+								onChange={(e) => {
+									console.log("Selected Subject Changed:", e.target.value);
+									setSelectedSubject(e.target.value);
+								}}
+								className="select-style"
+							>
+								<option value="" disabled hidden>
+									Select Your Subject
 								</option>
-							))}
-						</select>
+								{classCodes.map((classCode) => (
+									<option
+										key={classCode.subject_id}
+										value={classCode.subject_id}
+									>
+										{classCode.name}
+									</option>
+								))}
+							</select>
 						</div>
 					</div>
 
@@ -302,72 +314,10 @@ export default function StudentPage() {
 						</div>
 					)}
 
-					<div className="mx-24 my-8">
-						{/* Dropdown for selecting assessment */}
-						{selectedSubject && (
-							<div className="flex flex-row items-center space-x-12">
-								<select
-									value={selectedAssessment}
-									onChange={(e) => {
-										setSelectedAssessment(e.target.value);
-									}}
-									className="select-style"
-								>
-									<option value="" disabled>
-										Select Assessment
-									</option>
-									{assessmentsPass.map((assessmentPass) => (
-										<option
-											key={assessmentPass.assessment_id}
-											value={assessmentPass.assessment_id}
-										>
-											{assessmentPass.type}
-										</option>
-									))}
-								</select>
-							</div>
-						)}
-						{/* Input field for new grade and Save button */}
-						{selectedAssessment && (
-							<div>
-							<div>
-								<input
-									type="number"
-									value={newGrade}
-									onChange={(e) => {
-										const value = Math.min(100, Math.max(0, parseInt(e.target.value, 10)));
-										if (!isNaN(value)) {
-											setNewGrade(value.toString());
-										}
-									}}
-									placeholder="Enter achieved grade"
-									className="w-full p-4 text-xl font-medium text-white bg-transparent border-2 rounded-lg placeholder-purple-300 border-purple-500 focus:border-purple-700 focus:bg-dark-500 focus:outline-none transition duration-150 ease-in-out"
-								/>
-								<div className="h-14"></div>
-
-								<button
-									onClick={saveGrade}
-									className="text-white bg-gradient-to-r from-buttonPurple to-buttonOrange hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
-								>
-									Save Grade
-								</button>
-							</div>
-							<div className="h-14"></div>
-					
-							{/* <button
-								onClick={saveGrade}
-								className="text-white bg-gradient-to-r from-buttonPurple to-buttonOrange hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
-							>
-								Save Grade
-							</button> */}
-						</div>
-						)}
-					</div>
-
 					{/* Form to add a new assessment */}
 					{selectedSubject && (
 						<>
-							<div className="text-center justify-center items-center p-12 text-white text-2xl ">
+							<div className="text-center justify-center items-center p-6 text-white text-2xl ">
 								<h3>Add Assessment: </h3>
 							</div>
 							<form onSubmit={handleNewAssessmentSubmit} className="my-8">
@@ -396,6 +346,71 @@ export default function StudentPage() {
 							</form>
 						</>
 					)}
+
+					<div className="mx-24 mt-4 pb-6">
+						{/* Dropdown for selecting assessment */}
+						{selectedSubject && (
+							<div className="flex flex-row items-center space-x-12">
+								<select
+									value={selectedAssessment}
+									onChange={(e) => {
+										setSelectedAssessment(e.target.value);
+									}}
+									className="select-style"
+								>
+									<option value="" disabled>
+										Select Assessment
+									</option>
+									{assessmentsPass.map((assessmentPass) => (
+										<option
+											key={assessmentPass.assessment_id}
+											value={assessmentPass.assessment_id}
+										>
+											{assessmentPass.type}
+										</option>
+									))}
+								</select>
+							</div>
+						)}
+						{/* Input field for new grade and Save button */}
+						{selectedAssessment && (
+							<div>
+								<div>
+									<input
+										type="number"
+										value={newGrade}
+										onChange={(e) => {
+											const value = Math.min(
+												100,
+												Math.max(0, parseInt(e.target.value, 10))
+											);
+											if (!isNaN(value)) {
+												setNewGrade(value.toString());
+											}
+										}}
+										placeholder="Enter achieved grade"
+										className="w-full p-4 text-xl font-medium text-white bg-transparent border-2 rounded-lg placeholder-purple-300 border-purple-500 focus:border-purple-700 focus:bg-dark-500 focus:outline-none transition duration-150 ease-in-out"
+									/>
+									<div className="h-14"></div>
+
+									<button
+										onClick={saveGrade}
+										className="text-white bg-gradient-to-r from-buttonPurple to-buttonOrange hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
+									>
+										Save Grade
+									</button>
+								</div>
+								<div className="h-14"></div>
+
+								{/* <button
+								onClick={saveGrade}
+								className="text-white bg-gradient-to-r from-buttonPurple to-buttonOrange hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
+							>
+								Save Grade
+							</button> */}
+							</div>
+						)}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -404,17 +419,17 @@ export default function StudentPage() {
 function Banner({ userName }) {
 	const today = new Date();
 	return (
-		<div className="bg-bannerColor h-64 rounded-3xl p-12 flex flex-row items-center justify-between">
-			<div className="h-full flex flex-col space-y-12 mr-8 pl-8">
-				<div className="space-y-3">
-					<h2 className="text-white font-bold text-5xl">
-						Welcome back, {userName}!
-					</h2>
-					<p className="text-white/50 text-2xl">
-						Always stay updated in your <b>STUDENT PORTAL</b>
-					</p>
-				</div>
-				<h5 className="text-white/50 text-xl">{formatDate(today)}</h5>
+		<div className="bg-bannerColor h-64 rounded-3xl p-12 flex flex-row items-center justify-between relative">
+			<div className="h-full flex flex-col space-y-3">
+				<h2 className="text-white font-bold text-5xl md:text-4xl sm:text-3xl">
+					Welcome back, {userName}!
+				</h2>
+				<p className="text-white/50 text-2xl md:text-lg sm:text-base">
+					Always stay updated in your <b>STUDENT PORTAL</b>
+				</p>
+				<h5 className="text-white/50 text-xl absolute bottom-4 left-10">
+					{formatDate(today)}
+				</h5>
 			</div>
 			<div>
 				<img src="assets/laptopicon.svg" alt="" width={500} height={500} />

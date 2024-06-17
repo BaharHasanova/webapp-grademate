@@ -1,8 +1,11 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import Navbar from "./Navbar";
+
+const formatDate = (date: Date) => {
+	const options = { year: "numeric", month: "long", day: "numeric" };
+	return date.toLocaleDateString(undefined, options);
+};
 
 const AdminDashboard = () => {
 	const [viewType, setViewType] = useState("students");
@@ -25,29 +28,32 @@ const AdminDashboard = () => {
 		fetchData();
 	}, [viewType]);
 
+	const today = new Date();
 	return (
 		<div
-			className="min-h-screen w-full bg-no-repeat bg-cover bg-fixed flex flex-col"
+			className="flex min-h-screen w-full bg-no-repeat bg-cover bg-fixed"
 			style={{
 				backgroundImage: "url('/assets/login-page.png')",
 			}}
 		>
 			<div className="flex flex-grow min-h-screen">
 				<div className="flex-grow pl-18 pr-16">
-					<div className="bg-bannerColor rounded-3xl m-8 p-12 flex justify-between items-center">
+					<div className="bg-bannerColor h-64 rounded-3xl p-12 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+						{" "}
 						<div className="space-y-3">
 							<h2 className="text-white font-bold text-5xl">Dashboard</h2>
 							<p className="text-white/50 text-2xl">
 								View {viewType === "students" ? "Students" : "Advisors"}
 							</p>
-							<h5 className="text-white/50 text-xl">December 7, 2023</h5>
+							<h5 className="text-white/50 text-lg md:text-base sm:text-sm">
+								{formatDate(today)}
+							</h5>
 						</div>
 						<div>
 							<img
 								src="assets/admin-elements.svg"
-								alt=""
-								width={350}
-								height={350}
+								alt="Banner Illustration"
+								className="hidden sm:block w-48 sm:w-auto"
 							/>
 						</div>
 					</div>
@@ -56,24 +62,24 @@ const AdminDashboard = () => {
 					<div className="flex justify-center space-x-4 mb-8">
 						<button
 							onClick={() => setViewType("students")}
-							className={`sidebar-link text-2xl flex items-center justify-center text-white py-4 px-8 rounded hover:bg-lightPurple ${
-								viewType === "students" ? "bg-lightPurple" : ""
+							className={`sidebar-link text-2xl flex items-center justify-center py-4 px-8 rounded ${
+								viewType === "students" ? "bg-lightPurple active" : ""
 							}`}
 						>
 							View Students
 						</button>
 						<button
 							onClick={() => setViewType("advisors")}
-							className={`sidebar-link text-2xl flex items-center justify-center text-white py-4 px-8 rounded hover:bg-lightPurple ${
-								viewType === "advisors" ? "bg-lightPurple" : ""
+							className={`sidebar-link text-2xl flex items-center justify-center py-4 px-8 rounded ${
+								viewType === "advisors" ? "bg-lightPurple active" : ""
 							}`}
 						>
 							View Advisors
 						</button>
 					</div>
 
-					<div className="bg-lightPurple rounded-lg p-6">
-						<table className="min-w-full bg-white rounded-lg">
+					<div className="overflow-x-auto shadow-md rounded-lg mb-6">
+						<table className="min-w-full bg-white/10 backdrop-blur-md text-gray-300">
 							<thead>
 								<tr>
 									{viewType === "students" ? (

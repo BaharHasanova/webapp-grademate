@@ -1,8 +1,11 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import Navbar from "./Navbar";
+
+const formatDate = (date: Date) => {
+	const options = { year: "numeric", month: "long", day: "numeric" };
+	return date.toLocaleDateString(undefined, options);
+};
 
 const DropDashboard = () => {
 	const [viewType, setViewType] = useState("students");
@@ -33,24 +36,18 @@ const DropDashboard = () => {
 				: [...prevSelected, id]
 		);
 	};
+
 	const handleDropUsers = async () => {
 		try {
 			const url =
 				viewType === "students"
 					? "http://127.0.0.1:5000/grademate/student/drop"
 					: "http://127.0.0.1:5000/grademate/advisor/drop";
-
-			// Prepare payload
-			//   const payload = { ids: selectedUsers };
-
-			const response = await Axios.put(url, {
-				ids: selectedUsers,
-			});
+			const response = await Axios.put(url, { ids: selectedUsers });
 
 			if (response.status === 200) {
 				alert("Users dropped successfully!");
 				setSelectedUsers([]); // Clear selection after successful drop
-				// fetchData(); // Refresh the data
 			} else {
 				alert("Failed to drop users.");
 			}
@@ -60,48 +57,50 @@ const DropDashboard = () => {
 		}
 	};
 
+	const today = new Date();
 	return (
 		<div
-			className="min-h-screen w-full bg-no-repeat bg-cover bg-fixed flex flex-col"
-			style={{
-				backgroundImage: "url('/assets/login-page.png')",
-			}}
+			className="flex min-h-screen w-full bg-no-repeat bg-cover bg-fixed"
+			style={{ backgroundImage: "url('/assets/login-page.png')" }}
 		>
 			<div className="flex flex-grow min-h-screen">
 				<div className="flex-grow pl-18 pr-16">
-					<div className="bg-bannerColor rounded-3xl m-8 p-12 flex justify-between items-center">
+					<div className="bg-bannerColor h-64 rounded-3xl p-12 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
 						<div className="space-y-3">
 							<h2 className="text-white font-bold text-5xl">Drop Users</h2>
 							<p className="text-white/50 text-2xl">
 								Select and drop{" "}
 								{viewType === "students" ? "Students" : "Advisors"}
 							</p>
-							<h5 className="text-white/50 text-xl">December 7, 2023</h5>
+							<h5 className="text-white/50 text-lg md:text-base sm:text-sm">
+								{formatDate(today)}
+							</h5>
 						</div>
-						<div>
-							<img
-								src="assets/admin-elements.svg"
-								alt=""
-								width={350}
-								height={350}
-							/>
-						</div>
+						<img
+							src="assets/admin-elements.svg"
+							alt="Banner Illustration"
+							className="hidden sm:block w-48 sm:w-auto"
+						/>
 					</div>
 
 					{/* Buttons for selecting view type */}
 					<div className="flex justify-center space-x-4 mb-8">
 						<button
 							onClick={() => setViewType("students")}
-							className={`sidebar-link text-2xl flex items-center justify-center text-white py-4 px-8 rounded hover:bg-lightPurple ${
-								viewType === "students" ? "bg-lightPurple" : ""
+							className={`sidebar-link text-2xl flex items-center justify-center py-4 px-8 rounded ${
+								viewType === "students"
+									? "bg-lightPurple text-white"
+									: "text-gray-500"
 							}`}
 						>
 							Drop Students
 						</button>
 						<button
 							onClick={() => setViewType("advisors")}
-							className={`sidebar-link text-2xl flex items-center justify-center text-white py-4 px-8 rounded hover:bg-lightPurple ${
-								viewType === "advisors" ? "bg-lightPurple" : ""
+							className={`sidebar-link text-2xl flex items-center justify-center py-4 px-8 rounded ${
+								viewType === "advisors"
+									? "bg-lightPurple text-white"
+									: "text-gray-500"
 							}`}
 						>
 							Drop Advisors
@@ -109,10 +108,11 @@ const DropDashboard = () => {
 					</div>
 
 					<div className="bg-lightPurple rounded-lg p-6">
-						<table className="min-w-full bg-white rounded-lg">
+						<table className="min-w-full bg-white/10 backdrop-blur-md text-gray-300 rounded-lg">
 							<thead>
 								<tr>
 									<th className="py-2 px-4 border-b">Select</th>
+									{/* Dynamic Table Headers */}
 									{viewType === "students" ? (
 										<>
 											<th className="py-2 px-4 border-b">Student ID</th>
@@ -154,6 +154,7 @@ const DropDashboard = () => {
 												}
 											/>
 										</td>
+										{/* Dynamic Table Rows */}
 										{viewType === "students" ? (
 											<>
 												<td className="py-2 px-4">{item.student_id}</td>

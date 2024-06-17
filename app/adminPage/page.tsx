@@ -5,8 +5,8 @@ import Navbar from "../Components/Navbar";
 import Axios from "axios";
 import AdminDashboard from "../Components/AdminDashboard"; // Import the AdminDashboard component
 import DropDashboard from "../Components/AdminDrop"; // Import the DropDashboard component
-import useAuth from '../hooks/useAuth';
-
+import useAuth from "../hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 const formatDate = (date: Date) => {
 	const options = { year: "numeric", month: "long", day: "numeric" };
@@ -14,7 +14,7 @@ const formatDate = (date: Date) => {
 };
 
 const AdminPage = () => {
-	useAuth('admin');
+	useAuth("admin");
 	const [userType, setUserType] = useState("");
 	const [studentData, setStudentData] = useState({
 		student_id: "",
@@ -95,6 +95,13 @@ const AdminPage = () => {
 			setResponseMessage("Error registering user.");
 		}
 	};
+	const router = useRouter();
+
+	const handleLogout = () => {
+		if (window.confirm("Are you sure you want to logout?")) {
+			router.push("/");
+		}
+	};
 
 	return (
 		<div
@@ -112,18 +119,18 @@ const AdminPage = () => {
 			<div className="flex flex-grow min-h-screen">
 				<div className="flex-grow flex flex-col pl-18 pr-16">
 					<div className="flex items-start space-x-8 mt-8 ml-32">
-						<div className="w-64 bg-bannerColor rounded-3xl space-y-2 p-12 overflow-auto">
+						<div className="w-64 bg-bannerColor rounded-3xl p-12 overflow-auto h-full">
 							<div className="w-40 h-40 bg-gradient-to-t from-squareGradientDark to-squareGradientLight rounded-3xl mt-4 flex items-center justify-center">
 								<img
-									src="/assets/archive-icon.png"
+									src="/assets/archive-icon.svg"
 									alt=""
 									width={70}
 									height={70}
 								/>
 							</div>
-							<div className="space-y-4 py-8">
+							<div className="space-y-4 mt-8">
 								<a
-									onClick={() => setView("registration")} // Change view to registration
+									onClick={() => setView("registration")}
 									className={`sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple cursor-pointer ${
 										view === "registration" ? "bg-lightPurple" : ""
 									}`}
@@ -131,12 +138,12 @@ const AdminPage = () => {
 									<img
 										className="h-8 w-8 mr-2"
 										src="/assets/pencil.svg"
-										alt=""
+										alt="Registration"
 									/>
 									Registration
 								</a>
 								<a
-									onClick={() => setView("dashboard")} // Change view to dashboard
+									onClick={() => setView("dashboard")}
 									className={`sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple cursor-pointer ${
 										view === "dashboard" ? "bg-lightPurple" : ""
 									}`}
@@ -144,12 +151,12 @@ const AdminPage = () => {
 									<img
 										className="h-8 w-8 mr-2"
 										src="/assets/dashboard.svg"
-										alt=""
+										alt="Dashboard"
 									/>
 									Dashboard
 								</a>
 								<a
-									onClick={() => setView("drop")} // Change view to drop
+									onClick={() => setView("drop")}
 									className={`sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple cursor-pointer ${
 										view === "drop" ? "bg-lightPurple" : ""
 									}`}
@@ -157,20 +164,20 @@ const AdminPage = () => {
 									<img
 										className="h-8 w-8 mr-2"
 										src="/assets/documentx.svg"
-										alt=""
+										alt="Drop"
 									/>
 									Drop
 								</a>
 							</div>
-							<div>
+							<div className="mt-8">
 								<a
-									href="#logout"
+									onClick={handleLogout}
 									className="sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple"
 								>
 									<img
 										className="h-8 w-8 mr-2"
 										src="/assets/logout.svg"
-										alt=""
+										alt="Logout"
 									/>
 									Logout
 								</a>
@@ -409,7 +416,7 @@ const AdminPage = () => {
 										<div className="text-center">
 											<button
 												onClick={handleSubmit}
-												className="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-700"
+												className="bg-gradient-to-r from-purple-500 to-red-500 text-white py-2 px-4 rounded-lg"
 											>
 												Register{" "}
 												{userType === "student" ? "Student" : "Advisor"}
@@ -436,24 +443,23 @@ const AdminPage = () => {
 function Banner({ userName }) {
 	const today = new Date();
 	return (
-		<div className="bg-bannerColor h-64 rounded-3xl p-12 flex flex-row items-center justify-between">
-			<div className="h-full flex flex-col space-y-5 mr-8 pl-8">
-				<div className="space-y-3">
-					<h2 className="text-white font-bold text-3xl">
-						Welcome back,{userName}!
-					</h2>
-					<p className="text-white/50 text-2xl">
-						Always stay updated in your <b>ADMIN PORTAL</b>
-					</p>
-				</div>
-				<h5 className="text-white/50 text-xl">{formatDate(today)}</h5>
+		<div className="bg-bannerColor h-64 rounded-3xl p-12 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+			<div className="flex flex-col space-y-3">
+				<h2 className="text-white font-bold text-5xl md:text-4xl sm:text-3xl">
+					Welcome back, {userName}!
+				</h2>
+				<p className="text-white/50 text-xl md:text-lg sm:text-base mb-2 sm:mb-0">
+					Always stay updated in your <b>ADMIN PORTAL</b>
+				</p>
+				<h5 className="text-white/50 text-lg md:text-base sm:text-sm">
+					{formatDate(today)}
+				</h5>
 			</div>
 			<div>
 				<img
-					src="https://firebasestorage.googleapis.com/v0/b/realtimedatabasetest-f226a.appspot.com/o/bannerIllustrate.png?alt=media"
-					alt=""
-					width={500}
-					height={500}
+					src="assets/admin-elements.svg"
+					alt="Banner Illustration"
+					className="hidden sm:block w-48 sm:w-auto"
 				/>
 			</div>
 		</div>
@@ -461,106 +467,3 @@ function Banner({ userName }) {
 }
 
 export default AdminPage;
-
-// import React from "react";
-
-// import Navbar from "../Components/Navbar";
-// // import ExcelUploader from "../upload/page";
-
-// const AdminPage = () => {
-//   return (
-//     <div
-//       className="min-h-screen w-full bg-no-repeat bg-cover bg-fixed flex flex-col"
-//       style={{
-//         backgroundImage: "url('/assets/login-page.png')",
-//       }}
-//     >
-//       {/* Navbar - We ensure that the Navbar has a higher z-index */}
-//       <Navbar
-//         isHomePage={false}
-//         isLoginPage={false}
-//         pageType="adminPage"
-//         userName="Admin"
-//       />
-//       <div className="flex flex-grow min-h-screen">
-//         {/* Sidebar */}
-//         <div className="w-64 bg-bannerColor mt-8 ml-32 rounded-3xl space-y-2 p-12 overflow-auto">
-//           <div className="w-40 h-40 bg-gradient-to-t from-squareGradientDark to-squareGradientLight rounded-3xl mt-4 flex items-center justify-center">
-//             <img src="/assets/archive-icon.png" alt="" width={70} height={70} />
-//           </div>
-//           {/* Sidebar contents wrapped in a container for better spacing */}
-//           <div className="space-y-4 py-8">
-//             <a
-//               href="#registration"
-//               className="sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple"
-//             >
-//               <img className="h-8 w-8 mr-2" src="/assets/pencil.svg" alt="" />
-//               Registration
-//             </a>
-//             <a
-//               href="#dashboard"
-//               className="sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple"
-//             >
-//               <img
-//                 className="h-8 w-8 mr-2"
-//                 src="/assets/dashboard.svg"
-//                 alt=""
-//               />
-//               Dashboard
-//             </a>
-//             <a
-//               href="#drop"
-//               className="sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple"
-//             >
-//               <img
-//                 className="h-8 w-8 mr-2"
-//                 src="/assets/documentx.svg"
-//                 alt=""
-//               />
-//               Drop
-//             </a>
-//           </div>
-//           <div>
-//             <a
-//               href="#logout"
-//               className="sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple"
-//             >
-//               <img className="h-8 w-8 mr-2" src="/assets/logout.svg" alt="" />
-//               Logout
-//             </a>
-//           </div>
-//         </div>
-
-//         {/* Main Content */}
-//         <div className="flex-grow pl-18 pr-16">
-//           <div className="bg-bannerColor rounded-3xl m-8 p-12 flex justify-between items-center">
-//             <div className="space-y-3">
-//               <h2 className="text-white font-bold text-5xl">
-//                 Welcome back, Admin!
-//               </h2>
-//               <p className="text-white/50 text-2xl">
-//                 Always stay updated in your <b>ADMIN PORTAL</b>
-//               </p>
-//               <h5 className="text-white/50 text-xl">December 7, 2023</h5>
-//             </div>
-//             <div>
-//               <img
-//                 src="assets/admin-elements.svg"
-//                 alt=""
-//                 // className="max-w-xs md:max-w-sm lg:max-w-lg"
-//                 width={350}
-//                 height={350}
-//               />
-//             </div>
-//           </div>
-//           {/* Additional main content goes here */}
-//           {/* <div className="p-24 text-white">
-// 						<ExcelUploader></ExcelUploader>
-// 					</div> */}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default AdminPage;
