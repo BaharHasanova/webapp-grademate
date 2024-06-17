@@ -6,7 +6,7 @@ import Navbar from "../Components/Navbar";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-const adminLogin = () => {
+const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -64,7 +64,7 @@ const adminLogin = () => {
         <Navbar
           isHomePage={false}
           isLoginPage={true}
-          pageType={adminLogin}
+          pageType={AdminLogin}
           userName={"admin"}
         />
         <Form
@@ -80,4 +80,4 @@ const adminLogin = () => {
   );
 };
 
-export default adminLogin;
+export default AdminLogin;

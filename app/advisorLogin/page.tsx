@@ -6,7 +6,7 @@ import Navbar from "../Components/Navbar";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-const advisorLogin = () => {
+const AdvisorLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -68,7 +68,7 @@ const advisorLogin = () => {
         <Navbar
           isHomePage={false}
           isLoginPage={true}
-          pageType={advisorLogin}
+          pageType={AdvisorLogin}
           userName={"advisor"}
         />
         <Form
@@ -84,4 +84,4 @@ const advisorLogin = () => {
   );
 };
 
-export default advisorLogin;
+export default AdvisorLogin;
