@@ -165,7 +165,7 @@ export default function StudentPage() {
 	const saveGrade = async () => {
 		// Ensure that both the assessment and the new grade are selected
 		if (!selectedAssessment || !newGrade) {
-			alert("Please select an assessment and enter a grade.");
+			alert("Please select an assessment and enter a mark.");
 			return;
 		}
 
@@ -191,22 +191,22 @@ export default function StudentPage() {
 			const data = await response.json();
 
 			if (response.status === 200) {
-				console.log("Grade saved successfully");
+				console.log("Mark saved successfully");
 				fetchAssessmentsTable(); // Fetch the updated table data
 				setNewGrade(""); // Reset the new grade input
 				setSelectedAssessment(""); // Reset the selected assessment
 			} else {
 				console.error(
-					"Failed to save grade:",
+					"Failed to save the mark:",
 					data.error || "An error occurred"
 				);
-				setError(data.error || "Failed to save grade."); // Set an error message
-				alert(data.error || "Failed to save grade."); // Display an alert with the error
+				setError(data.error || "Failed to save the mark."); // Set an error message
+				alert(data.error || "Failed to save the mark."); // Display an alert with the error
 			}
 		} catch (error) {
-			console.error("Error saving grade:", error);
-			setError("Error saving grade."); // Set an error message
-			alert("Error saving grade."); // Display an alert with the error
+			console.error("Error saving mark:", error);
+			setError("Error saving mark."); // Set an error message
+			alert("Error saving mark."); // Display an alert with the error
 		}
 
 		setIsLoading(false); // End loading
@@ -216,7 +216,7 @@ export default function StudentPage() {
 		e.preventDefault();
 
 		if (!newAssessmentType || !newMaxGrade) {
-			alert("Please enter the assessment type and max grade.");
+			alert("Please enter the assessment type and max mark.");
 			return;
 		}
 
@@ -333,7 +333,7 @@ export default function StudentPage() {
 										type="number"
 										value={newMaxGrade}
 										onChange={(e) => setNewMaxGrade(e.target.value)}
-										placeholder="Max Grade"
+										placeholder="Max Mark"
 										className="w-full p-4 text-xl font-medium text-white bg-transparent border-2 rounded-lg placeholder-purple-300 border-purple-500 focus:border-purple-700 focus:bg-dark-500 focus:outline-none transition duration-150 ease-in-out"
 									/>
 									<button
@@ -388,7 +388,7 @@ export default function StudentPage() {
 												setNewGrade(value.toString());
 											}
 										}}
-										placeholder="Enter achieved grade"
+										placeholder="Enter achieved mark"
 										className="w-full p-4 text-xl font-medium text-white bg-transparent border-2 rounded-lg placeholder-purple-300 border-purple-500 focus:border-purple-700 focus:bg-dark-500 focus:outline-none transition duration-150 ease-in-out"
 									/>
 									<div className="h-14"></div>
@@ -397,7 +397,7 @@ export default function StudentPage() {
 										onClick={saveGrade}
 										className="text-white bg-gradient-to-r from-buttonPurple to-buttonOrange hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-4 text-center"
 									>
-										Save Grade
+										Save Mark
 									</button>
 								</div>
 								<div className="h-14"></div>

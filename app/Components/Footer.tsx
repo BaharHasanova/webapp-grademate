@@ -4,7 +4,7 @@ import { FaInstagram } from "react-icons/fa";
 
 const Footer = () => {
 	return (
-		<div className="mt-16 px-8 lg:px-36">
+		<div className="pb-6 mt-16 px-8 lg:px-36">
 			<h3 className="text-white text-3xl font-bold mb-4">FEATURED ON</h3>{" "}
 			{/* Increased font size */}
 			<div className="footer-bg py-12 text-white rounded-xl glassmorphism">
@@ -24,7 +24,7 @@ const Footer = () => {
 						<p className="text-lg">
 							{" "}
 							{/* Increased font size */}
-							Contact Us <br /> +601111111111
+							Contact Us <br /> +603-8921 2020
 						</p>
 						<p className="text-lg">
 							{" "}
@@ -38,7 +38,7 @@ const Footer = () => {
 							Follow Us on Social Media
 						</p>
 						<a
-							href="https://www.instagram.com/yourusername"
+							href="https://www.instagram.com/uniten.official"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="mt-4"
