@@ -29,7 +29,7 @@ const RegisterComponent = () => {
         formData.append("advisor_id", advisorId);
 
         try {
-            const response = await Axios.post("http://127.0.0.1:5000/grademate/advisor/add_advisee/bulk", formData, {
+            const response = await Axios.post("https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/add_advisee/bulk", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

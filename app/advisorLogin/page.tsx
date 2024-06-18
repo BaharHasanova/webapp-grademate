@@ -6,7 +6,7 @@ import Navbar from "../Components/Navbar";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-const advisorLogin = () => {
+const AdvisorLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,7 +16,7 @@ const advisorLogin = () => {
     event.preventDefault();
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/grademate/advisor/login",
+        "https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/login",
         {
           method: "POST",
           headers: {
@@ -68,7 +68,7 @@ const advisorLogin = () => {
         <Navbar
           isHomePage={false}
           isLoginPage={true}
-          pageType={advisorLogin}
+          pageType={AdvisorLogin}
           userName={"advisor"}
         />
         <Form
@@ -84,4 +84,4 @@ const advisorLogin = () => {
   );
 };
 
-export default advisorLogin;
+export default AdvisorLogin;

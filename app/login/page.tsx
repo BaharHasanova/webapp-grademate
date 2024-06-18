@@ -6,7 +6,7 @@ import Navbar from "../Components/Navbar";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-const adminLogin = () => {
+const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,7 +16,7 @@ const adminLogin = () => {
     event.preventDefault();
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/grademate/admin/login",
+        "https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/admin/login",
         {
           method: "POST",
           headers: {
@@ -64,7 +64,7 @@ const adminLogin = () => {
         <Navbar
           isHomePage={false}
           isLoginPage={true}
-          pageType={adminLogin}
+          pageType={AdminLogin}
           userName={"admin"}
         />
         <Form
@@ -80,4 +80,4 @@ const adminLogin = () => {
   );
 };
 
-export default adminLogin;
+export default AdminLogin;

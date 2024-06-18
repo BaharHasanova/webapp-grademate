@@ -76,7 +76,7 @@ export default function StudentPage() {
 			if (!studentId) return;
 			try {
 				const response = await Axios.get(
-					"http://127.0.0.1:5000/grademate/student/class_code",
+					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/student/class_code",
 					{ params: { student_id: studentId } }
 				);
 				setClassCodes(response.data);
@@ -98,12 +98,12 @@ export default function StudentPage() {
 
 			try {
 				const assessmentsResponse = await Axios.get(
-					"http://127.0.0.1:5000/grademate/subject/assessments",
+					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/subject/assessments",
 					{ params: { subject_id: selectedSubject } }
 				);
 
 				const gradesResponse = await Axios.get(
-					"http://127.0.0.1:5000/grademate/student/assessment_grades",
+					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/student/assessment_grades",
 					{
 						params: {
 							subject_id: selectedSubject,
@@ -146,7 +146,7 @@ export default function StudentPage() {
 			const fetchAssessments = async () => {
 				try {
 					const response = await Axios.get(
-						`http://127.0.0.1:5000/grademate/subject/assessments`,
+						`https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/subject/assessments`,
 						{ params: { subject_id: selectedSubject } }
 					);
 					setAssessmentsPass(response.data);
@@ -174,7 +174,7 @@ export default function StudentPage() {
 
 		try {
 			const response = await fetch(
-				"http://127.0.0.1:5000/grademate/grade/save_grade",
+				"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/grade/save_grade",
 				{
 					method: "POST",
 					headers: {
@@ -222,7 +222,7 @@ export default function StudentPage() {
 
 		try {
 			const response = await Axios.post(
-				"http://127.0.0.1:5000/grademate/subject/assessment",
+				"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/subject/assessment",
 				{
 					type: newAssessmentType,
 					max_grade: newMaxGrade,
@@ -239,7 +239,7 @@ export default function StudentPage() {
 				// Fetch the updated assessments list to include the new assessment
 				const fetchAssessments = async () => {
 					const response = await Axios.get(
-						`http://127.0.0.1:5000/grademate/subject/assessments`,
+						`https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/subject/assessments`,
 						{ params: { subject_id: selectedSubject } }
 					);
 					setAssessmentsPass(response.data);

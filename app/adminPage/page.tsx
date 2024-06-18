@@ -43,7 +43,7 @@ const AdminPage = () => {
 		const fetchAdvisors = async () => {
 			try {
 				const response = await Axios.get(
-					"http://127.0.0.1:5000/grademate/advisors"
+					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisors"
 				);
 				setAdvisors(response.data);
 			} catch (error) {
@@ -54,7 +54,7 @@ const AdminPage = () => {
 		const fetchPrograms = async () => {
 			try {
 				const response = await Axios.get(
-					"http://127.0.0.1:5000/grademate/programs"
+					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/programs"
 				);
 				setPrograms(response.data);
 			} catch (error) {
@@ -79,13 +79,13 @@ const AdminPage = () => {
 		try {
 			if (userType === "student") {
 				const response = await Axios.post(
-					"http://127.0.0.1:5000/grademate/student/register",
+					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/student/register",
 					studentData
 				);
 				setResponseMessage("Student registered successfully!");
 			} else if (userType === "advisor") {
 				const response = await Axios.post(
-					"http://127.0.0.1:5000/grademate/advisor/register",
+					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/register",
 					advisorData
 				);
 				setResponseMessage("Advisor registered successfully!");
