@@ -21,7 +21,7 @@ const AdminPage = () => {
 		full_name: "",
 		email: "",
 		password: "",
-		status: "Active",
+		status: 1,
 		cgpa: "",
 		gpa: "",
 		advisor_id: "",
@@ -32,7 +32,7 @@ const AdminPage = () => {
 		full_name: "",
 		email: "",
 		password: "",
-		status: "Active",
+		status: 1,
 	});
 	const [advisors, setAdvisors] = useState([]);
 	const [programs, setPrograms] = useState([]);
