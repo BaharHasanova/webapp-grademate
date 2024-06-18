@@ -11,9 +11,9 @@ export default function IntroSection() {
 			}}
 		>
 			<div className="w-full px-8 sm:px-10 lg:px-16 xl:px-24 2xl:px-32">
-				<div className="grid md:grid-cols-2 gap-8 md:gap-12 xl:gap-24 items-center my-20">
+				<div className="grid md:grid-cols-2 gap-8 md:gap-12 xl:gap-24 items-start my-20">
 					<div>
-						<h1 className="text-6xl font-bold text-gray-800 sm:text-7xl lg:text-9xl lg:leading-tight dark:text-white">
+						<h1 className="text-5xl font-bold text-gray-800 sm:text-6xl lg:text-8xl lg:leading-tight dark:text-white">
 							Track Your <br /> Progress
 						</h1>
 						<p className="mt-16 text-2xl text-gray-800 dark:text-white">
@@ -37,11 +37,7 @@ export default function IntroSection() {
 						</div>
 					</div>
 					<div>
-						<img
-							src="/assets/monitor.png"
-							alt="Monitor"
-							className="w-full" // Let the image be as wide as the column allows
-						/>
+						<img src="/assets/monitor.png" alt="Monitor" className="w-full" />
 					</div>
 				</div>
 			</div>

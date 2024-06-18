@@ -72,9 +72,4 @@
 		margin-left: auto; /* Pushes the button to the right, aligns with the end of the form elements */
 		padding-right: 24px; /* Optional: Right padding for not touching the screen edge */
 	}
-
-	.container {
-		/* Adjust this selector to target the correct element */
-		background-color: #; /* Set this to match your page’s background color */
-	}
 }
