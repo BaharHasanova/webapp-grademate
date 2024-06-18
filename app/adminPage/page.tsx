@@ -76,20 +76,17 @@ const AdminPage = () => {
 	};
 
 	const handleSubmit = async () => {
+		const payload = userType === "student" ? { ...studentData } : { ...advisorData };
+		if (userType === "student" && !payload.advisor_id) {
+			delete payload.advisor_id;  // or payload.advisor_id = null;
+		}	
 		try {
-			if (userType === "student") {
-				const response = await Axios.post(
-					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/student/register",
-					studentData
-				);
-				setResponseMessage("Student registered successfully!");
-			} else if (userType === "advisor") {
-				const response = await Axios.post(
-					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/register",
-					advisorData
-				);
-				setResponseMessage("Advisor registered successfully!");
-			}
+			const url = userType === "student" 
+				? "https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/student/register" 
+				: "https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/register";
+			
+			const response = await Axios.post(url, payload);
+			setResponseMessage(`${userType.charAt(0).toUpperCase() + userType.slice(1)} registered successfully!`);
 		} catch (error) {
 			console.error("Error registering user:", error);
 			setResponseMessage("Error registering user.");
