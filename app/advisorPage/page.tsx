@@ -313,7 +313,9 @@ const AdvisorPage = () => {
 				); // Debugging
 
 				setAssessments(combinedAssessments);
-				setGradePercentage(gradesResponse.data[0].grade_percentage || 0); // Use 0 if undefined
+				const gradePercentage = parseFloat(gradesResponse.data[0].grade_percentage).toFixed(1); // Round to three decimal places
+				setGradePercentage(gradePercentage); // Use backend data or 0 if undefined
+				// setGradePercentage(gradesResponse.data[0].grade_percentage || 0); // Use 0 if undefined
 				setShowGrades(true);
 			} catch (error) {
 				console.error("Failed to fetch assessments:", error);

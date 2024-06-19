@@ -88,6 +88,7 @@ export default function StudentPage() {
 
 		fetchClassCodes();
 	}, [studentId]); // Re-fetch when studentId changes
+	
 
 	const fetchAssessmentsTable = async () => {
 		if (selectedSubject && studentId) {
@@ -95,13 +96,13 @@ export default function StudentPage() {
 			setIsLoading(true); // Start loading
 			setError(""); // Clear previous errors
 			setGradePercentage(0); // Reset to 0 before fetching new data
-
+	
 			try {
 				const assessmentsResponse = await Axios.get(
 					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/subject/assessments",
 					{ params: { subject_id: selectedSubject } }
 				);
-
+	
 				const gradesResponse = await Axios.get(
 					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/student/assessment_grades",
 					{
@@ -111,7 +112,7 @@ export default function StudentPage() {
 						},
 					}
 				);
-
+	
 				const combinedAssessments = assessmentsResponse.data.map(
 					(assessment) => {
 						const achievedGradeData = gradesResponse.data[1].find(
@@ -127,10 +128,12 @@ export default function StudentPage() {
 						};
 					}
 				);
-
+	
 				setAssessments(combinedAssessments);
-				setGradePercentage(gradesResponse.data[0].grade_percentage || 0); // Use backend data or 0 if undefined
-
+				// Here we apply the rounding
+				const gradePercentage = parseFloat(gradesResponse.data[0].grade_percentage).toFixed(1); // Round to three decimal places
+				setGradePercentage(gradePercentage); // Use backend data or 0 if undefined
+	
 				setShowGrades(true); // Show grades table and percentage
 			} catch (error) {
 				console.error("Failed to fetch assessments:", error);
