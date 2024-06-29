@@ -39,6 +39,7 @@ const AdvisorPage = () => {
 	const [advisees, setAdvisees] = useState<Advisee[]>([]);
 	const [subjects, setSubjects] = useState<Subject[]>([]);
 	const [advisorId, setAdvisorId] = useState("");
+	const [advisorName, setAdvisorName] = useState("");
 	const [selectedAdvisee, setSelectedAdvisee] = useState("");
 	const [selectedSemester, setSemesterId] = useState("");
 	const [assessments, setAssessments] = useState([]);
@@ -56,6 +57,14 @@ const AdvisorPage = () => {
 	const [selectedStudent, setSelectedStudent] = useState("");
 	const [unassignedSearchTerm, setUnassignedSearchTerm] = useState("");
 	const [showUnassignedStudents, setShowUnassignedStudents] = useState(false);
+
+	useEffect(() => {
+		const token = localStorage.getItem("token");
+		if (token) {
+			const decoded = jwtDecode(token);
+			setAdvisorName(decoded.name);
+		}
+	}, []);
 
 	const handleNewData = (newData) => {
 		setData(newData);
@@ -342,7 +351,7 @@ const AdvisorPage = () => {
 				isHomePage={false}
 				isLoginPage={false}
 				pageType="AdvisorPage"
-				userName="Advisor"
+				userName={advisorName}
 			/>
 
 			<div className="flex flex-row h-full p-8 space-x-4">
@@ -387,14 +396,14 @@ const AdvisorPage = () => {
 					</a>
 					<a
 						onClick={handleLogout}
-						className="sidebar-link text-2xl flex items-center text-gray-300 py-4 rounded hover:bg-lightPurple"
+						className="sidebar-link text-2xl flex items-center text-gray-300 py-4 rounded hover:bg-lightPurple cursor-pointer"
 					>
 						<img className="h-8 w-8 mr-2" src="/assets/logout.svg" alt="" />
 						Logout
 					</a>
 				</aside>
 				<main className="flex-1 p-8 bg-white bg-opacity-5 rounded-3xl shadow-lg">
-					<Banner userName="Advisor" />
+					{Banner({ userName: advisorName })}
 					{currentView === "advisees" && (
 						<>
 							<div className="mx-24 mt-8 flex justify-between items-end">
@@ -627,11 +636,11 @@ const AdvisorPage = () => {
 								<button
 									onClick={prevPage}
 									disabled={currentPage === 1}
-									className={`p-2 border border-gray-300 rounded ${
+									className={`p-2  ${
 										currentPage === 1 ? "cursor-not-allowed opacity-50" : ""
 									} text-white`}
 								>
-									<i className="fas fa-arrow-left"></i>
+									<img src="/assets/CaretLeftSquare.svg" />
 								</button>
 								{[
 									...Array(
@@ -654,14 +663,14 @@ const AdvisorPage = () => {
 										currentPage ===
 										Math.ceil(filteredAdvisees.length / adviseesPerPage)
 									}
-									className={`p-2 border border-gray-300 rounded ${
+									className={`p-2  ${
 										currentPage ===
 										Math.ceil(filteredAdvisees.length / adviseesPerPage)
 											? "cursor-not-allowed opacity-50"
 											: ""
 									} text-white`}
 								>
-									<i className="fas fa-arrow-right"></i>
+									<img src="/assets/CaretRightSquare.svg" />
 								</button>
 							</div>
 						</>
