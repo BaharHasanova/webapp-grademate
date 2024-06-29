@@ -172,7 +172,7 @@ const AdminPage = () => {
 							<div className="mt-8">
 								<a
 									onClick={handleLogout}
-									className="sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple"
+									className="sidebar-link text-2xl flex items-center text-white py-4 rounded hover:bg-lightPurple cursor-pointer"
 								>
 									<img
 										className="h-8 w-8 mr-2"
@@ -467,3 +467,4 @@ function Banner({ userName }) {
 }
 
 export default AdminPage;
+``;

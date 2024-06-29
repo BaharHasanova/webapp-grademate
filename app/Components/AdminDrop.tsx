@@ -11,6 +11,9 @@ const DropDashboard = () => {
 	const [viewType, setViewType] = useState("students");
 	const [data, setData] = useState([]);
 	const [selectedUsers, setSelectedUsers] = useState([]);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 10;
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -54,6 +57,31 @@ const DropDashboard = () => {
 		} catch (error) {
 			console.error("Error dropping users:", error);
 			alert("Error dropping users.");
+		}
+	};
+
+	const handleSearchChange = (e) => {
+		setSearchTerm(e.target.value);
+		setCurrentPage(1); // Reset to the first page when search term changes
+	};
+
+	const filteredData = data.filter((item) =>
+		item.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+	);
+
+	const indexOfLastItem = currentPage * itemsPerPage;
+	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+	const currentData = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
+	const nextPage = () => {
+		if (currentPage < Math.ceil(filteredData.length / itemsPerPage)) {
+			setCurrentPage(currentPage + 1);
+		}
+	};
+
+	const prevPage = () => {
+		if (currentPage > 1) {
+			setCurrentPage(currentPage - 1);
 		}
 	};
 
@@ -108,6 +136,22 @@ const DropDashboard = () => {
 					</div>
 
 					<div className="bg-lightPurple rounded-lg p-6">
+						{/* Search box */}
+						<div className="relative mb-4">
+							<input
+								type="text"
+								placeholder="Search by Name"
+								value={searchTerm}
+								onChange={handleSearchChange}
+								className="p-2 pr-10 border border-gray-300 rounded-xl bg-transparent text-white w-full"
+							/>
+							<img
+								className="absolute right-3 top-3 h-4 w-4"
+								src="/assets/Search.svg"
+								alt="Search"
+							/>
+						</div>
+
 						<table className="min-w-full bg-white/10 backdrop-blur-md text-gray-300 rounded-lg">
 							<thead>
 								<tr>
@@ -115,6 +159,7 @@ const DropDashboard = () => {
 									{/* Dynamic Table Headers */}
 									{viewType === "students" ? (
 										<>
+											<th className="py-2 px-4 border-b">#</th>
 											<th className="py-2 px-4 border-b">Student ID</th>
 											<th className="py-2 px-4 border-b">Full Name</th>
 											<th className="py-2 px-4 border-b">Email</th>
@@ -126,6 +171,7 @@ const DropDashboard = () => {
 										</>
 									) : (
 										<>
+											<th className="py-2 px-4 border-b">#</th>
 											<th className="py-2 px-4 border-b">Advisor ID</th>
 											<th className="py-2 px-4 border-b">Full Name</th>
 											<th className="py-2 px-4 border-b">Email</th>
@@ -135,7 +181,7 @@ const DropDashboard = () => {
 								</tr>
 							</thead>
 							<tbody>
-								{data.map((item, index) => (
+								{currentData.map((item, index) => (
 									<tr key={index} className="border-b">
 										<td className="py-2 px-4 text-center">
 											<input
@@ -157,6 +203,9 @@ const DropDashboard = () => {
 										{/* Dynamic Table Rows */}
 										{viewType === "students" ? (
 											<>
+												<td className="py-2 px-4">
+													{index + 1 + indexOfFirstItem}
+												</td>
 												<td className="py-2 px-4">{item.student_id}</td>
 												<td className="py-2 px-4">{item.full_name}</td>
 												<td className="py-2 px-4">{item.email}</td>
@@ -170,6 +219,9 @@ const DropDashboard = () => {
 											</>
 										) : (
 											<>
+												<td className="py-2 px-4">
+													{index + 1 + indexOfFirstItem}
+												</td>
 												<td className="py-2 px-4">{item.advisor_id}</td>
 												<td className="py-2 px-4">{item.full_name}</td>
 												<td className="py-2 px-4">{item.email}</td>
@@ -182,6 +234,46 @@ const DropDashboard = () => {
 								))}
 							</tbody>
 						</table>
+
+						{/* Pagination */}
+						<div className="mt-4 flex justify-center items-center space-x-2">
+							<button
+								onClick={prevPage}
+								disabled={currentPage === 1}
+								className={`p-2 ${
+									currentPage === 1 ? "cursor-not-allowed opacity-50" : ""
+								} text-white`}
+							>
+								<img src="/assets/CaretLeftSquare.svg" alt="Previous Page" />
+							</button>
+							{[
+								...Array(Math.ceil(filteredData.length / itemsPerPage)).keys(),
+							].map((number) => (
+								<button
+									key={number + 1}
+									onClick={() => setCurrentPage(number + 1)}
+									className={`p-2 border border-gray-300 rounded ${
+										currentPage === number + 1 ? "bg-gray-500" : "bg-gray-800"
+									} text-white`}
+								>
+									{number + 1}
+								</button>
+							))}
+							<button
+								onClick={nextPage}
+								disabled={
+									currentPage === Math.ceil(filteredData.length / itemsPerPage)
+								}
+								className={`p-2 ${
+									currentPage === Math.ceil(filteredData.length / itemsPerPage)
+										? "cursor-not-allowed opacity-50"
+										: ""
+								} text-white`}
+							>
+								<img src="/assets/CaretRightSquare.svg" alt="Next Page" />
+							</button>
+						</div>
+
 						<div className="text-center mt-6">
 							<button
 								onClick={handleDropUsers}
