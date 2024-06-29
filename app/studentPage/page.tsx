@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
 import { jwtDecode } from "jwt-decode";
 import Axios from "axios";
-import GradesTable from "../Components/GradesTable";
+import GradesTableStudent from "../Components/GradesTableStudent";
 import GradePercentage from "../Components/GradesPercentage";
 import useAuth from "../hooks/useAuth";
 
@@ -95,13 +95,15 @@ export default function StudentPage() {
 			setIsLoading(true); // Start loading
 			setError(""); // Clear previous errors
 			setGradePercentage(0); // Reset to 0 before fetching new data
-
+	
 			try {
+				// Fetching assessment structure
 				const assessmentsResponse = await Axios.get(
 					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/subject/assessments",
 					{ params: { subject_id: selectedSubject } }
 				);
-
+	
+				// Fetching grades
 				const gradesResponse = await Axios.get(
 					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/student/assessment_grades",
 					{
@@ -111,26 +113,29 @@ export default function StudentPage() {
 						},
 					}
 				);
-
-				const combinedAssessments = assessmentsResponse.data.map(
-					(assessment) => {
-						const achievedGradeData = gradesResponse.data[1].find(
-							(grade) => grade.assessment_id === assessment.assessment_id
-						);
-						return {
-							assessment_id: assessment.assessment_id,
-							type: assessment.type,
-							max_grade: `${assessment.max_grade}`,
-							achievedGrade: achievedGradeData
-								? achievedGradeData.achieved_grade
-								: "-", // Show "N/A" if no grade is found
-						};
-					}
-				);
-
+	
+				console.log("Assessments Response:", assessmentsResponse.data);
+				console.log("Grades Response:", gradesResponse.data);
+	
+				// Assuming gradesResponse.data contains an array of grades under a specific key, let's say `assessments`
+				const gradesData = gradesResponse.data.assessments || [];
+	
+				// Mapping to combine assessments with grades
+				const combinedAssessments = assessmentsResponse.data.map((assessment) => {
+					const achievedGradeData = gradesData.find(
+						(grade) => grade.assessment_id === assessment.assessment_id
+					);
+					return {
+						assessment_id: assessment.assessment_id,
+						type: assessment.type,
+						max_grade: `${assessment.max_grade}`,
+						achievedGrade: achievedGradeData ? achievedGradeData.achieved_grade.toString() : "-",
+					};
+				});
+	
 				setAssessments(combinedAssessments);
-				setGradePercentage(gradesResponse.data[0].grade_percentage || 0); // Use backend data or 0 if undefined
-
+				setGradePercentage(parseFloat(gradesResponse.data.grade_percentage || 0));
+	
 				setShowGrades(true); // Show grades table and percentage
 			} catch (error) {
 				console.error("Failed to fetch assessments:", error);
@@ -160,6 +165,40 @@ export default function StudentPage() {
 			fetchAssessmentsTable();
 		}
 	}, [selectedSubject]); // Rerun this effect when selectedSubject changes
+	
+	const saveGradeForRow = async (index: number) => {
+		const selectedGrade = assessments[index];
+		setIsLoading(true);
+		try {
+		  const response = await fetch(
+			"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/grade/save_grade",
+			{
+			  method: "POST",
+			  headers: {
+				"Content-Type": "application/json",
+			  },
+			  body: JSON.stringify({
+				studentId: studentId,
+				selectedAssessment: selectedGrade.assessment_id,
+				newGrade: selectedGrade.achievedGrade,
+			  }),
+			}
+		  );
+	  
+		  const data = await response.json();
+		  if (response.status === 200) {
+			console.log("Mark saved successfully for assessment", selectedGrade.type);
+			fetchAssessmentsTable();  // Refresh the table to reflect the updated data
+		  } else {
+			console.error("Failed to save the mark:", data.error || "An error occurred");
+			alert(data.error || "Failed to save the mark.");
+		  }
+		} catch (error) {
+		  console.error("Error saving the mark:", error);
+		  alert("Error saving the mark.");
+		}
+		setIsLoading(false);
+	  };
 
 	// API Call to save new grade
 	const saveGrade = async () => {
@@ -211,6 +250,25 @@ export default function StudentPage() {
 
 		setIsLoading(false); // End loading
 	};
+
+	// Function to handle grade changes from the GradesTable
+	const onGradeChange = (index: number, newGrade: string) => {
+		// Check if the new grade is a valid number or empty string for intermediate input state
+		if (newGrade === "" || (/^\d{0,3}(\.\d{0,1})?$/.test(newGrade) && parseFloat(newGrade) <= 100)) {
+		  const clampedGrade = parseFloat(newGrade) > 100 ? "100" : newGrade;
+		  
+		  // Create a new copy of the assessments array with updated grades
+		  const updatedAssessments = assessments.map((assessment, idx) => {
+			if (idx === index) {
+			  return { ...assessment, achievedGrade: clampedGrade };
+			}
+			return assessment;
+		  });
+	  
+		  // Update the assessments state with the new array
+		  setAssessments(updatedAssessments);
+		}
+	  };
 	// Function to handle the submission of the new assessment
 	const handleNewAssessmentSubmit = async (e) => {
 		e.preventDefault();
@@ -306,10 +364,10 @@ export default function StudentPage() {
 					{showGrades && (
 						<div className="flex flex-wrap justify-around items-center">
 							<div className="w-full md:w-[40%]">
-								<GradesTable grades={assessments} />
+								<GradesTableStudent grades={assessments} onGradeChange={onGradeChange} saveGradeForRow={saveGradeForRow} />
 							</div>
 							<div style={{ width: "330px", height: "330px" }}>
-								<GradePercentage percentage={gradePercentage} />
+								<GradePercentage percentage={gradePercentage.toFixed(1)} />
 							</div>
 						</div>
 					)}
@@ -377,15 +435,12 @@ export default function StudentPage() {
 							<div>
 								<div>
 									<input
-										type="number"
+										type="text"
 										value={newGrade}
 										onChange={(e) => {
-											const value = Math.min(
-												100,
-												Math.max(0, parseInt(e.target.value, 10))
-											);
-											if (!isNaN(value)) {
-												setNewGrade(value.toString());
+											const value = e.target.value;
+											if (value.match(/^\d{0,3}(\.\d{0,1})?$/)) { // Regex to allow numbers with up to one decimal place
+											  setNewGrade(value);
 											}
 										}}
 										placeholder="Enter achieved mark"

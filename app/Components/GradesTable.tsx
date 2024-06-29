@@ -10,14 +10,14 @@ const GradesTable = ({ grades }) => {
       </div>
       {grades.map((grade, index) => (
         <div
-          key={index}
-          className={`flex justify-between text-white py-2 px-4 ${
-            index % 2 ? "bg-purple-700" : "bg-purple-800"
-          }`}
+            key={grade.assessment_id || index}  // Assuming each grade has a unique assessment_id
+            className={`flex justify-between text-white py-2 px-4 ${
+                index % 2 ? "bg-purple-700" : "bg-purple-800"
+            }`}
         >
-          <div className="w-1/3">{grade.type}</div>
-          <div className="w-1/3">{grade.max_grade}</div>
-          <div className="w-1/3">{grade.achievedGrade}%</div>
+            <div className="w-1/3">{grade.type}</div>
+            <div className="w-1/3">{grade.max_grade}</div>
+            <div className="w-1/3">{grade.achievedGrade}%</div>
         </div>
       ))}
     </div>

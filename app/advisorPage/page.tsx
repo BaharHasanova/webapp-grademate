@@ -230,43 +230,32 @@ const AdvisorPage = () => {
 	}, [selectedAdvisee, advisees]);
 
 	useEffect(() => {
-		let isMounted = true; // This will help in avoiding setting state on unmounted component
-
+		// Function to fetch subjects based on the selected student
 		const fetchSubjects = async () => {
-			if (selectedSemester) {
-				// Ensure there's a selected semester
-				setIsLoading(true); // Indicate loading subjects
+			if (selectedAdvisee) {
+				setIsLoading(true);
 				try {
 					const response = await Axios.get(
 						`https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/advisor/student/semester/classes`,
-						{ params: { semester_id: selectedSemester } }
+						{ params: { student_id: selectedAdvisee, semester_id: selectedSemester } }
 					);
-					if (isMounted) {
-						setSubjects(response.data); // Set subjects only if component is still mounted
-					}
+					setSubjects(response.data);
+					setSelectedSubject(''); // Reset selected subject when advisee changes
 				} catch (error) {
 					console.error("Failed to fetch subjects:", error);
-					if (isMounted) {
-						setSubjects([]); // Handle error in fetching subjects
-					}
+					setSubjects([]); // Reset subjects if there's an error
+					setSelectedSubject(''); // Ensure no subject is selected on error
 				} finally {
-					if (isMounted) {
-						setIsLoading(false); // Ensure to turn off loading indicator
-					}
+					setIsLoading(false);
 				}
 			} else {
-				if (isMounted) {
-					setSubjects([]); // Reset subjects if semester is not selected
-				}
+				setSubjects([]); // Reset subjects if no student is selected
+				setSelectedSubject(''); // Reset selected subject
 			}
 		};
-
+	
 		fetchSubjects();
-
-		return () => {
-			isMounted = false; // Cleanup function to mark component as unmounted
-		};
-	}, [selectedSemester]); // Only re-run the effect if selectedSemester changes
+	}, [selectedAdvisee, selectedSemester]); // Re-run the effect if the selected student or semester changes
 
 	const fetchAssessments = async () => {
 		if (selectedSubject && selectedAdvisee) {
@@ -274,13 +263,13 @@ const AdvisorPage = () => {
 			setIsLoading(true);
 			setError("");
 			setGradePercentage(0); // Reset to 0 before fetching new data
-
+	
 			try {
 				const assessmentsResponse = await Axios.get(
 					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/subject/assessments",
 					{ params: { subject_id: selectedSubject } }
 				);
-
+	
 				const gradesResponse = await Axios.get(
 					"https://f9wurdvze8.execute-api.ap-southeast-1.amazonaws.com/production/grademate/student/assessment_grades",
 					{
@@ -290,30 +279,26 @@ const AdvisorPage = () => {
 						},
 					}
 				);
-
+	
+				// Ensure to match assessments with their respective grades
 				const combinedAssessments = assessmentsResponse.data.map(
 					(assessment) => {
-						const achievedGradeData = gradesResponse.data[1].find(
+						const achievedGradeData = gradesResponse.data.assessments.find(
 							(grade) => grade.assessment_id === assessment.assessment_id
 						);
 						return {
 							type: assessment.type,
-							max_grade: `${assessment.max_grade}`,
-							achievedGrade: achievedGradeData
-								? achievedGradeData.achieved_grade
-								: "N/A",
+							max_grade: assessment.max_grade,
+							achievedGrade: achievedGradeData ? achievedGradeData.achieved_grade : "N/A",
 						};
 					}
 				);
-
-				console.log("Combined Assessments:", combinedAssessments); // Debugging
-				console.log(
-					"Grade Percentage:",
-					gradesResponse.data[0].grade_percentage || 0
-				); // Debugging
-
+	
+				console.log("Combined Assessments:", combinedAssessments);
+				console.log("Grade Percentage:", gradesResponse.data.grade_percentage || 0);
+	
 				setAssessments(combinedAssessments);
-				setGradePercentage(gradesResponse.data[0].grade_percentage || 0); // Use 0 if undefined
+				setGradePercentage(gradesResponse.data.grade_percentage || 0); // Use 0 if undefined
 				setShowGrades(true);
 			} catch (error) {
 				console.error("Failed to fetch assessments:", error);
@@ -396,27 +381,22 @@ const AdvisorPage = () => {
 					{currentView === "advisees" && (
 						<>
 							<div className="mx-24 mt-8 flex justify-between items-end">
-								<div className="select-container">
-									<h2 className="text-white mb-6 text-2xl">Student Name: </h2>
-									<select
-										id="advisee-select"
-										value={selectedAdvisee} // Use value to control the selected option
-										onChange={(e) => setSelectedAdvisee(e.target.value)}
-										className="select-style"
-									>
-										<option value="" disabled>
-											Select Your Advisee
+							<div className="select-container">
+								<h2 className="text-white mb-6 text-2xl">Student Name: </h2>
+								<select
+									id="advisee-select"
+									value={selectedAdvisee}
+									onChange={(e) => setSelectedAdvisee(e.target.value)}
+									className="select-style"
+								>
+									<option value="" disabled>Select Your Advisee</option>
+									{advisees.map((advisee) => (
+										<option key={advisee.student_id} value={advisee.student_id}>
+											{advisee.full_name} ({advisee.student_id})
 										</option>
-										{advisees.map((advisee) => (
-											<option
-												key={advisee.student_id}
-												value={advisee.student_id}
-											>
-												{advisee.full_name}
-											</option>
-										))}
-									</select>
-								</div>
+									))}
+								</select>
+							</div>
 								<div className="select-container">
 									<h2 className="text-white mb-6 text-2xl">Semester: </h2>
 									<select
@@ -443,19 +423,14 @@ const AdvisorPage = () => {
 									<h2 className="text-white mb-6 text-2xl">Subject Name: </h2>
 									<select
 										id="subject-select"
+										value={selectedSubject}
 										onChange={(e) => setSelectedSubject(e.target.value)}
-										defaultValue={""}
+										disabled={!selectedSemester || subjects.length === 0}
 										className="select-style"
-										disabled={!selectedSemester}
 									>
-										<option value="" disabled>
-											Select Subject
-										</option>
+										<option value="" disabled>Select Subject</option>
 										{subjects.map((subject) => (
-											<option
-												key={subject.semester_id}
-												value={subject.subject_id}
-											>
+											<option key={subject.subject_id} value={subject.subject_id}>
 												{subject.name}
 											</option>
 										))}
